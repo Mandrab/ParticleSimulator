@@ -6,11 +6,12 @@
 public class Main {
 
     public static void main(String[] args) {
-                
-    	//SimulationViewer viewer = new SimulationViewer(620,620);
 
-    	Model sim = new Model( );
-        sim.execute(  );
-
+    	long startTime = System.currentTimeMillis( );
+    	Model model = new Model( );
+    	model.execute( 100, 500 );
+    	long stopTime = System.currentTimeMillis( );
+        
+        System.out.println( "Process speedup " + ( stopTime - startTime ) );
     }
 }

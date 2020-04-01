@@ -1,5 +1,3 @@
-import java.util.*;
-
 /*
  * This class represents a body, moving in the field.
  * 
@@ -93,7 +91,7 @@ public class Body {
             pos.change(pos.getX(), bounds.getY0());
             vel.change(vel.getX(), -vel.getY());
         }
-    }        
+    }
     
     public static void solveCollision(Body b1, Body b2) {
 

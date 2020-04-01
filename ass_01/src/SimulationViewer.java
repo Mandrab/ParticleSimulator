@@ -12,8 +12,10 @@ import javax.swing.*;
  *
  */
 public class SimulationViewer extends JFrame {
-    
-    private VisualiserPanel panel;
+
+	private static final long serialVersionUID = -5516015410790143416L;
+
+	private VisualiserPanel panel;
     
     /**
      * Creates a view of the specified size (in pixels)
@@ -47,11 +49,12 @@ public class SimulationViewer extends JFrame {
     }
         
     public static class VisualiserPanel extends JPanel {
-        
-    	private ArrayList<Body> bodies = new ArrayList<Body>();
+
+		private static final long serialVersionUID = -165761220960106001L;
+
+		private ArrayList<Body> bodies = new ArrayList<Body>();
     	private long nIter;
     	private double vt;
-    	private double energy;
     	
         private long dx;
         private long dy;

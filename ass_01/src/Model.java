@@ -17,7 +17,7 @@ public class Model {
         final int nProc = Runtime.getRuntime( ).availableProcessors( );
 		System.out.println( "N cores: " + nProc );
 
-		simulatorPool = IntStream.rangeClosed( 0, nProc ).mapToObj( i -> new Simulator(  ) )
+		simulatorPool = IntStream.rangeClosed( 0, 1 ).mapToObj( i -> new Simulator(  ) )
         		.collect( Collectors.toList( ) );
     }
 
@@ -36,7 +36,7 @@ public class Model {
             bodies.add(b);
         }
 
-        int increment = bodies.size( ) / simulatorPool.size( ) - 1;
+        int increment = bodies.size( ) / simulatorPool.size( );
 
         int toIdx, fromIdx = 0;
         
@@ -46,12 +46,6 @@ public class Model {
         } else
         	toIdx = increment + bodies.size( ) - simulatorPool.size( ) * increment;
 
-        for( int i = 0; i < simulatorPool.size( ) && i < bodies.size( ); i++ ) {
-        	simulatorPool.get( i ).setBodies( bodies.subList( fromIdx, toIdx ) );
-        	fromIdx = toIdx;
-        	toIdx += increment;
-        }
-
         for( int i = 0; i < simulatorPool.size( ); i++ ) {
         	simulatorPool.get( i ).setBodies( bodies.subList( fromIdx, toIdx ) );
         	fromIdx = toIdx;
@@ -59,6 +53,6 @@ public class Model {
         }
 
         final CyclicBarrier barrier = new CyclicBarrier( simulatorPool.size( ) );
-        simulatorPool.forEach( simulator -> simulator.start( nSteps, barrier ) );
+        simulatorPool.forEach( simulator -> simulator.start( nSteps, barrier, bounds ) );
     }
 }
