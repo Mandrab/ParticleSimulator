@@ -17,10 +17,12 @@ public class Simulator {
 
 	private Boundary bounds;
 	
+	private int myBodiesNum;
+	private int otherBodiesNum;
 	private int bodiesSize;
 	private List<Body> bodies;		// bodies in the field
 	private int startIdx;
-	private int quantity;
+	private int stopIdx;
 	
 	public Simulator( Boundary bounds ) {
 		this.bodies = new ArrayList<Body>( );
@@ -31,11 +33,10 @@ public class Simulator {
 
 		thread = new Thread( ( ) -> {
 
-	        /* simulation loop */
-	        for ( int step = 0; step < nSteps; step++ ) {
+	        for ( int step = 0; step < nSteps; step++ ) {			// loop for number of iteration
 	        	
 	        	/* compute bodies new pos */
-	        	for ( int i = startIdx; i < quantity; i++ )
+	        	for ( int i = startIdx; i < stopIdx; i++ )
 	        		bodies.get( i ).updatePos( INCREMENT_TIME );
 
 	        	try {
@@ -46,19 +47,17 @@ public class Simulator {
 
 	        	// check collisions
 	        	Body subjectBall, firstBall, secondBall;
-	        	int realIdx;
 
-			    for ( int i = startIdx; i < quantity; i++ ) {
+			    for ( int i = startIdx; i < stopIdx; i++ ) {
 			    	subjectBall = bodies.get( i );
-
+			    	
 					for (int j = i + 1; j < bodiesSize; j++ ) {
-						realIdx = j % bodiesSize;
 
-			        	if ( i < realIdx ) {
+			        	if ( i < j ) {
 			        		firstBall = subjectBall;
-				        	secondBall = bodies.get( realIdx );
+				        	secondBall = bodies.get( j );
 			        	} else {
-			        		firstBall = bodies.get( realIdx );
+			        		firstBall = bodies.get( j );
 			        		secondBall = subjectBall;
 			        	}
 			        	synchronized ( firstBall ) {
@@ -72,7 +71,7 @@ public class Simulator {
 		        }
 
 			    // check boundaries
-			    for ( int i = startIdx; i < quantity; i++ )
+			    for ( int i = startIdx; i < stopIdx; i++ )
 	        		bodies.get( i ).checkAndSolveBoundaryCollision( bounds );
 	        }
 		} );
@@ -83,8 +82,10 @@ public class Simulator {
 	public void setBodies( List<Body> bodies, int startIdx, int quantity ) {
 		this.bodiesSize = bodies.size( );
 		this.bodies = bodies;
-		this.startIdx = startIdx % bodiesSize;
-		this.quantity = quantity;
+		this.startIdx = startIdx;
+		this.stopIdx = startIdx + quantity;
+		this.myBodiesNum = quantity;
+		
 	}
 
 	public void join( ) throws InterruptedException {
