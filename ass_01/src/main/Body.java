@@ -95,32 +95,47 @@ public class Body {
         }
     }
     
-    public static void solveCollision(Body b1, Body b2) {
+    public static void solveCollision( Body b1, Body b2 ) {
 
-    	Position x1 = b1.getPos();
-    	Position x2 = b2.getPos();
-    	Velocity v1 = b1.getVel();
-    	Velocity v2 = b2.getVel();
+    	Position x1 = b1.getPos( );
+    	Position x2 = b2.getPos( );
+    	Velocity v1 = b1.getVel( );
+    	Velocity v2 = b2.getVel( );
 
     	double x12dx = x1.getX() - x2.getX();
     	double x12dy = x1.getY() - x2.getY();
     	double v12dx = v1.getX() - v2.getX();
     	double v12dy = v1.getY() - v2.getY();    	
     	double fact12 = (x12dx*v12dx + x12dy*v12dy) / (x12dx*x12dx + x12dy*x12dy);    	
-    	double v1x = v1.getX() - x12dx*fact12;
-    	double v1y = v1.getY() - x12dy*fact12;
+    	double v1x = v1.getX() - x12dx * fact12;
+    	double v1y = v1.getY() - x12dy * fact12;
 
     	double x21dx = x2.getX() - x1.getX();
     	double x21dy = x2.getY() - x1.getY();
     	double v21dx = v2.getX() - v1.getX();
     	double v21dy = v2.getY() - v1.getY();    	
     	double fact21 = (x21dx*v21dx + x21dy*v21dy) / (x21dx*x21dx + x21dy*x21dy);    	
-    	double v2x = v2.getX() - x21dx*fact21;
-    	double v2y = v2.getY() - x21dy*fact21;
+    	double v2x = v2.getX() - x21dx * fact21;
+    	double v2y = v2.getY() - x21dy * fact21;
 
-    	b1.changeVel(v1x, v1y);
-    	b2.changeVel(v2x, v2y);
+    	/*double deltaPosX = x1.getX( ) - x2.getX( );
+    	double deltaPosY = x1.getY( ) - x2.getY( );
+
+    	double distance = deltaPosX * deltaPosX + deltaPosY * deltaPosY;
+
+    	double deltaVelX = v1.getX( ) - v2.getX( );
+    	double deltaVelY = v1.getY( ) - v2.getY( );
+
+    	double fact = ( deltaPosX * deltaVelX + deltaPosY * deltaVelY ) / distance;
+    	double deltaXfact = deltaPosX * fact;
+    	double deltaYfact = deltaPosY * fact;
+    	double v1x = v1.getX( ) - deltaXfact;
+    	double v1y = v1.getY( ) - deltaYfact;
+   	
+    	double v2x = v2.getX( ) + deltaXfact;
+    	double v2y = v2.getY( ) + deltaYfact;*/
+
+    	b1.changeVel( v1x, v1y );
+    	b2.changeVel( v2x, v2y );
     }
-    
-
 }

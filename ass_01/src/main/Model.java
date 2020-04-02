@@ -5,63 +5,59 @@ import java.util.concurrent.CyclicBarrier;
 
 public class Model {
 
-	private List<Simulator> simulatorPool;
-	private List<Body> bodies;						// bodies in the field
+	private int simulatorCount;
+	private Simulator[] simulatorPool;
+	private Body[] bodies;						// bodies in the field
 	private Boundary bounds;						// boundary of the field
 	
 	public Model( ) {
-		simulatorPool = new ArrayList<>( );			// create simulator pools as arraylist (faster access than linked et similia)
-		
-    	bodies = new ArrayList<Body>( );			// create bodies as arraylist (faster access than linked et similia)
-
 		bounds = new Boundary(-1.0,-1.0,1.0,1.0);	// initializing boundary
 	}
 	
     public void initialize( int nBodies ) {
+
+    	bodies = new Body[ nBodies ];
+    	addBalls( nBodies );						// generate nBodies balls
+
+    	createSimulators( nBodies );					// create right number of simulators (thread)
     	
-    	buildBalls( nBodies );						// generate nBodies balls
-    	
-    	buildSimulators( nBodies );					// create right number of simulators (thread)
-    	
-    	final int forNum = nBodies < simulatorPool.size( ) ? 1
-    			: nBodies / simulatorPool.size( );
+    	final int forNum = nBodies < simulatorCount ? 1
+    			: nBodies / simulatorCount;
     	System.out.println( "Bodies for simulator:\t" + forNum );
 
     	int simulatorIdx = 0;
-        for( int fromIdx = 0; simulatorIdx < simulatorPool.size( ); simulatorIdx++ ) {
-        	simulatorPool.get( simulatorIdx ).setBodies( bodies, fromIdx, forNum );
+        for( int fromIdx = 0; simulatorIdx < simulatorCount; simulatorIdx++ ) {
+        	simulatorPool[ simulatorIdx ].setBodies( bodies, fromIdx, forNum );
         	fromIdx += forNum;
         }
 
-        if ( nBodies % simulatorPool.size( ) != 0 ) {
-        	final int bodiesForLast = forNum + nBodies % simulatorPool.size( );
-        	simulatorPool.get( --simulatorIdx ).setBodies( bodies, simulatorIdx * forNum, bodiesForLast );
+        if ( nBodies % simulatorCount != 0 ) {
+        	final int bodiesForLast = forNum + nBodies % simulatorCount;
+        	simulatorPool[ --simulatorIdx ].setBodies( bodies, simulatorIdx * forNum, bodiesForLast );
         	System.out.println( "Bodies for last simulator: " + bodiesForLast );
         }
     }
 
-    public long execute( int nSteps ) {
-    	
-    	System.out.println( "\nExecuting " + simulatorPool.size( ) + " simulators\n" );
+    public long execute( int nSteps ) throws InterruptedException {
 
-        final CyclicBarrier barrier = new CyclicBarrier( simulatorPool.size( ) );
-        
+    	System.out.println( "\nExecuting " + simulatorCount + " simulators\n" );
+
+        final CyclicBarrier barrier = new CyclicBarrier( simulatorCount );
+
         long startTime = System.currentTimeMillis( );
 
-        simulatorPool.forEach( simulator -> simulator.start( nSteps, barrier ) );
-
-        simulatorPool.forEach( simulator -> {
-			try {
-				simulator.join( );
-			} catch ( InterruptedException e ) {
-				e.printStackTrace( );
-			}
-		} );
+        for ( Simulator simulator : simulatorPool ) {
+			simulator.start( nSteps, barrier );
+		}
+        
+        for ( Simulator simulator : simulatorPool ) {
+        	simulator.join( );
+		}
 
         return System.currentTimeMillis( ) - startTime;
     }
 
-    private void buildBalls( int nBodies ) {
+    private void addBalls( int nBodies ) {
 
     	final Random rand = new Random( System.currentTimeMillis( ) );
 
@@ -72,17 +68,19 @@ public class Model {
             double speed = rand.nextDouble( ) * 0.05;
 
             Body b = new Body( new Position( x, y ), new Velocity( dx * speed, Math.sqrt( 1 - dx*dx ) * speed ), 0.01 );
-            bodies.add( b );
+            bodies[ i ] = b;
         }
     }
 
-    private void buildSimulators( int nBodies ) {
+    private void createSimulators( int nBodies ) {
     	
     	final int nProc = Runtime.getRuntime( ).availableProcessors( );
 		System.out.println( "Number of cores:\t" + nProc );
-    	
-		for ( int i = 0; i < nProc +1 && i < nBodies; i++ )
-			simulatorPool.add( new Simulator( bounds ) );
-		System.out.println( "Number of simulators:\t" + simulatorPool.size( ) );
+
+		simulatorCount = Math.min( nProc + 1, nBodies );
+		simulatorPool = new Simulator[ simulatorCount ];
+		for ( int i = 0; i < simulatorCount; i++ )
+			simulatorPool[ i ] = new Simulator( bounds );
+		System.out.println( "Number of simulators:\t" + simulatorCount );
     }
 }
