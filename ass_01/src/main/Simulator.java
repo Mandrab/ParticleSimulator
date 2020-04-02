@@ -46,20 +46,14 @@ public class Simulator {
 				}
 
 	        	// check collisions
-	        	Body subjectBall, firstBall, secondBall;
+	        	Body firstBall, secondBall;
 
 			    for ( int i = startIdx; i < stopIdx; i++ ) {
-			    	subjectBall = bodies.get( i );
+			    	firstBall = bodies.get( i );
 			    	
 					for (int j = i + 1; j < bodiesSize; j++ ) {
+			        	secondBall = bodies.get( j );
 
-			        	if ( i < j ) {
-			        		firstBall = subjectBall;
-				        	secondBall = bodies.get( j );
-			        	} else {
-			        		firstBall = bodies.get( j );
-			        		secondBall = subjectBall;
-			        	}
 			        	synchronized ( firstBall ) {
 				        	synchronized ( secondBall ) {
 								if ( firstBall.collideWith( secondBall ) ) {
