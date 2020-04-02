@@ -2,12 +2,15 @@ package main;
 
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Model {
 
 	private List<Simulator> simulatorPool;
 	private List<Body> bodies;						// bodies in the field
 	private Boundary bounds;						// boundary of the field
+	private Lock lock = new ReentrantLock();
 	
 	public Model( ) {
 		simulatorPool = new ArrayList<>( );			// create simulator pools as arraylist (faster access than linked et similia)
@@ -30,7 +33,7 @@ public class Model {
     	int simulatorIdx = 0;
         for( int fromIdx = 0; simulatorIdx < simulatorPool.size( ); simulatorIdx++ ) {
         	simulatorPool.get( simulatorIdx ).setBodies( bodies, fromIdx, forNum );
-        	fromIdx += forNum;
+        	fromIdx += forNum;      	
         }
 
         if ( nBodies % simulatorPool.size( ) != 0 ) {
@@ -71,7 +74,7 @@ public class Model {
             double dx = - 1 + rand.nextDouble( ) * 2;
             double speed = rand.nextDouble( ) * 0.05;
 
-            Body b = new Body( new Position( x, y ), new Velocity( dx * speed, Math.sqrt( 1 - dx*dx ) * speed ), 0.01 );
+            Body b = new Body( new Position( x, y ), new Velocity( dx * speed, Math.sqrt( 1 - dx*dx ) * speed ), 0.01, lock );
             bodies.add( b );
         }
     }

@@ -3,6 +3,8 @@ package main;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -13,11 +15,14 @@ import javax.swing.*;
  * @author aricci
  *
  */
-public class SimulationViewer extends JFrame {
+public class SimulationViewer extends JFrame implements ActionListener{
 
 	private static final long serialVersionUID = -5516015410790143416L;
 
 	private VisualiserPanel panel;
+	private JButton buttonStart;
+	private JButton buttonStop;
+	private JPanel buttonPanel;
     
     /**
      * Creates a view of the specified size (in pixels)
@@ -28,7 +33,7 @@ public class SimulationViewer extends JFrame {
         setTitle("Bodies Simulation");
         setSize(w,h);
         setResizable(false);
-        panel = new VisualiserPanel(w,h);
+        this.panel = new VisualiserPanel(w,h);
         getContentPane().add(panel);
         addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent ev){
@@ -39,12 +44,21 @@ public class SimulationViewer extends JFrame {
 			}
 		});
         setVisible(true);
+        
+        this.buttonStart = new JButton("start");
+        this.buttonStop= new JButton("stop");
+        this.buttonPanel= new JPanel();
+        this.buttonPanel.add(this.buttonStart);
+        this.buttonPanel.add(this.buttonStop);
+        getContentPane().add(this.buttonPanel);
+        this.buttonStart.addActionListener(this);
+        this.buttonStop.addActionListener(this);
     }
     
     public void display(ArrayList<Body> bodies, double vt, long iter){
         try {
 	    	SwingUtilities.invokeAndWait(() -> {
-	        	panel.display(bodies, vt, iter);
+	        	this.panel.display(bodies, vt, iter);
 	        });
         } catch (Exception ex) {
         }
@@ -76,7 +90,7 @@ public class SimulationViewer extends JFrame {
     		          RenderingHints.VALUE_RENDER_QUALITY);
     		g2.clearRect(0,0,this.getWidth(),this.getHeight());
 	        
-    		bodies.forEach( b -> {
+    		this.bodies.forEach( b -> {
 	        	Position p = b.getPos();
 	            double rad = b.getRadius();
 	            int x0 = (int)(dx + p.getX()*dx);
@@ -94,4 +108,15 @@ public class SimulationViewer extends JFrame {
         	repaint();
         }
     }
+
+	@Override
+	public void actionPerformed(ActionEvent action) {
+		  Object src = action.getSource();
+	        if (src==this.buttonStart){
+	            //model start 
+	        } else {
+	            //model stop
+	        }
+		
+	}
 }

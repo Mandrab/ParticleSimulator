@@ -6,7 +6,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 /*
- * possibilitÃ  di eseguire il calcolo del solveCollision fuori sezione critica
+ * possibilita'  di eseguire il calcolo del solveCollision fuori sezione critica
  * 	-> check variazione nelle prestazioni
  */
 public class Simulator {
@@ -23,7 +23,7 @@ public class Simulator {
 	private List<Body> bodies;		// bodies in the field
 	private int startIdx;
 	private int stopIdx;
-	
+
 	public Simulator( Boundary bounds ) {
 		this.bodies = new ArrayList<Body>( );
 		this.bounds = bounds;
@@ -54,16 +54,22 @@ public class Simulator {
 					for (int j = i + 1; j < bodiesSize; j++ ) {
 			        	secondBall = bodies.get( j );
 
-			        	synchronized ( firstBall ) {
-				        	synchronized ( secondBall ) {
-								if ( firstBall.collideWith( secondBall ) ) {
+							if ( firstBall.collideWith( secondBall ) ) {
+									firstBall.locked();
+									secondBall.locked();
 									Body.solveCollision( firstBall, secondBall );
-								}
+									firstBall.unlocked();
+									secondBall.unlocked();
 							}
-			        	}
 					}
 		        }
-
+			    
+			    try {
+					barrier.await( );
+				} catch ( InterruptedException | BrokenBarrierException e ) {
+					e.printStackTrace( );
+				}
+			    
 			    // check boundaries
 			    for ( int i = startIdx; i < stopIdx; i++ )
 	        		bodies.get( i ).checkAndSolveBoundaryCollision( bounds );
