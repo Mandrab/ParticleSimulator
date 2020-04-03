@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -23,7 +24,11 @@ import main.Model.State;
 public class View extends JFrame implements ActionListener{
 
 	private static final long serialVersionUID = -5516015410790143416L;
+	private static final int WIDTH = 620;
+	private static final int HEIGHT = 620; 
 
+	private Controller controller;
+	
 	private VisualiserPanel panel;
 	private JButton buttonStart;
 	private JButton buttonStop;
@@ -31,17 +36,22 @@ public class View extends JFrame implements ActionListener{
     
     /**
      * Creates a view of the specified size (in pixels)
-     * @param w
-     * @param h
+     * @param WIDTH
+     * @param HEIGHT
      */
-    public View( int w, int h ){
+    public View( Controller controller ) {
+    	
+    	this.controller = controller;
+
         setTitle( "Bodies Simulation" );
-        
-        getContentPane( ).setLayout( new BorderLayout( ) );
-        setSize( w, h );
+
+        setLayout( new BorderLayout( ) );
+
         setResizable( false );
-        this.panel = new VisualiserPanel( w, h );
-        getContentPane( ).add( panel, BorderLayout.CENTER );
+
+        panel = new VisualiserPanel( WIDTH, HEIGHT );
+        panel.setPreferredSize( new Dimension( WIDTH, HEIGHT ) );
+
         addWindowListener( new WindowAdapter( ) {
 			public void windowClosing( WindowEvent ev ) {
 				System.exit( -1 );
@@ -50,16 +60,23 @@ public class View extends JFrame implements ActionListener{
 				System.exit( -1 );
 			}
 		} );
+
+        buttonStart = new JButton( "start" );
+        buttonStart.addActionListener( this );
+
+        buttonStop = new JButton( "stop" );
+        buttonStop.addActionListener( this );
+
+        buttonPanel = new JPanel( );
+        buttonPanel.add( this.buttonStart );
+        buttonPanel.add( this.buttonStop );
+        buttonPanel.setPreferredSize( new Dimension( WIDTH, buttonPanel.getPreferredSize( ).height ) );
+
+        add( buttonPanel, BorderLayout.NORTH );
+        add( panel, BorderLayout.CENTER );
+
+        pack( );
         setVisible( true );
-        
-        this.buttonStart = new JButton( "start" );
-        this.buttonStop = new JButton( "stop" );
-        this.buttonPanel = new JPanel( );
-        this.buttonPanel.add( this.buttonStart );
-        this.buttonPanel.add( this.buttonStop );
-        getContentPane( ).add( this.buttonPanel,BorderLayout.NORTH );
-        this.buttonStart.addActionListener( this );
-        this.buttonStop.addActionListener( this );
     }
     
     public void display( List<Position> bodies, double vt, long iter ){
@@ -81,13 +98,13 @@ public class View extends JFrame implements ActionListener{
         private long dx;
         private long dy;
         
-        public VisualiserPanel( int w, int h ) {
-            setSize( w, h );
-            dx = w/2 - 20;
-            dy = h/2 - 20;
+        public VisualiserPanel( int WIDTH, int HEIGHT ) {
+            setSize( WIDTH, HEIGHT );
+            dx = WIDTH/2 - 20;
+            dy = HEIGHT/2 - 20;
         }
 
-        public void paint( Graphics g ){
+        public void paint( Graphics g ) {
     		Graphics2D g2 = ( Graphics2D ) g;
 
     		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING,
@@ -96,33 +113,33 @@ public class View extends JFrame implements ActionListener{
     		          RenderingHints.VALUE_RENDER_QUALITY );
     		g2.clearRect( 0, 0, this.getWidth( ), this.getHeight( ) );
 	        
-    		this.bodies.forEach( b -> {
+    		bodies.forEach( b -> {
 	            double rad = 0.01;
-	            int x0 = (int)(dx + b.getX()*dx);
-		        int y0 = (int)(dy - b.getY()*dy);
-		        g2.drawOval(x0,y0, (int)(rad*dx*2), (int)(rad*dy*2));
-		    });
-    		String time = String.format("%.2f", vt);
+	            int x0 = ( int )( dx + b.getX( ) * dx );
+		        int y0 = ( int )( dy - b.getY( ) * dy );
+		        g2.drawOval( x0, y0, ( int )( rad * dx * 2 ), ( int )( rad * dy * 2 ) );
+		    } );
+    		String time = String.format( "%.2f", vt );
     		g2.drawString( "Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter, 2, 20 );
         }
         
-        public void display( List<Position> bodies, double vt, long iter){
+        public void display( List<Position> bodies, double vt, long iter ) {
             this.bodies = bodies;
             this.vt = vt;
             this.nIter = iter;
-        	repaint();
+        	repaint( );
         }
     }
 
 	@Override
 	public void actionPerformed(ActionEvent action) {
 
-		  Object src = action.getSource();
-	        if (src==this.buttonStart){
-	            //model start 
-	        } else {
-	            //model stop
-	        }
+		Object src = action.getSource();
+        if ( src == buttonStart ) {
+        	SwingUtilities.invokeLater( ( ) -> controller.start( ) );
+        } else {
+        	SwingUtilities.invokeLater( ( ) -> controller.pause( ) );
+        }
 	}
 	
 	public void updateView( State state ) {

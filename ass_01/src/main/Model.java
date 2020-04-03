@@ -2,24 +2,32 @@ package main;
 
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 public class Model {
 
+	private static final GlobalLogger logger = GlobalLogger.get( );
+
 	private boolean running;
 	private State actualState;
+
+	private AtomicBoolean run;
 
 	private int simulatorCount;
 	private Simulator[] simulatorPool;
 	private Body[] bodies;							// bodies in the field
 	private Boundary bounds;						// boundary of the field
-	private Lock lock = new ReentrantLock();
+	private Lock lock = new ReentrantLock( );
 
 	public Model( ) {
-		bounds = new Boundary(-1.0,-1.0,1.0,1.0);	// initializing boundary
-		running = false;
+		bounds = new Boundary( -1.0, -1.0, 1.0, 1.0 );	// initializing boundary
 		actualState = new State( 0, 0, new ArrayList<Position>( ) );
+
+		running = false;
+		run = new AtomicBoolean( false );		
 	}
 
     public void initialize( int nBodies ) {
@@ -31,7 +39,7 @@ public class Model {
     	
     	final int forNum = nBodies < simulatorCount ? 1
     			: nBodies / simulatorCount;
-    	System.out.println( "Bodies for simulator:\t" + forNum );
+    	logger.log( Level.INFO, "Bodies for simulator:\t\t" + forNum );
 
     	int simulatorIdx = 0;
 
@@ -43,45 +51,64 @@ public class Model {
         if ( nBodies % simulatorCount != 0 ) {
         	final int bodiesForLast = forNum + nBodies % simulatorCount;
         	simulatorPool[ --simulatorIdx ].setBodies( bodies, simulatorIdx * forNum, bodiesForLast );
-        	System.out.println( "Bodies for last simulator: " + bodiesForLast );
+        	logger.log( Level.INFO, "Bodies for last simulator: \t" + bodiesForLast );
         }
+
+        run.set( true );
     }
 
-    public long execute( int nSteps ) throws InterruptedException {
+    public void execute( int nSteps ) throws InterruptedException {
 
-    	System.out.println( "\nExecuting " + simulatorCount + " simulators\n" );
+    	logger.log( Level.INFO, "\nExecuting " + simulatorCount + " simulators\n" );
 
     	running = true;
 
-        final CyclicBarrier barrier = new CyclicBarrier( simulatorCount, ( ) -> {
-        	//synchronized( actualState ) {
-        		List<Position> ballsPositions = new ArrayList<>( );
-            	for ( Body body : bodies ) {
-    				ballsPositions.add( new Position( body.getPos( ).getX( ), body.getPos( ).getY( ) ) );
-    			}
-            	actualState = new State( nSteps, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
+    	synchronized( run ) {
+    		while ( ! run.get( ) )
+				try {
+					run.wait( );
+				} catch (InterruptedException e) { e.printStackTrace( ); }
+    	}
+    	
+    	CyclicBarrier barrier = new CyclicBarrier( simulatorCount, ( ) -> {
+    		synchronized( run ) {
+        		while ( ! run.get( ) )
+    				try {
+    					run.wait( );
+    				} catch (InterruptedException e) { e.printStackTrace( ); }
+        	}
+    		List<Position> ballsPositions = new ArrayList<>( );
+        	for ( Body body : bodies ) {
+				ballsPositions.add( new Position( body.getPos( ).getX( ), body.getPos( ).getY( ) ) );
+			}
+        	actualState = new State( nSteps, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
 			//}
         } );
 
-        long startTime = System.currentTimeMillis( );
+        for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, barrier );
 
-        for ( Simulator simulator : simulatorPool ) {
-			simulator.start( nSteps, barrier );
-		}
-        
-        for ( Simulator simulator : simulatorPool ) {
-        	simulator.join( );
-		}
+        for ( Simulator simulator : simulatorPool ) simulator.join( );
 
         running = false;
-
-        return System.currentTimeMillis( ) - startTime;
     }
-    
+
+    public void start( ) {
+    	synchronized ( run ) {
+    		run.set( true );
+        	run.notify( );
+		}
+    }
+
+    public void pause( ) {
+    	synchronized ( run ) {
+    		run.set( false );
+    	}
+    }
+
     public boolean isRunning( ) {
     	return running;
     }
-    
+
     public State getState( ) {
     	return actualState;
     }
@@ -104,13 +131,13 @@ public class Model {
     private void createSimulators( int nBodies ) {
     	
     	final int nProc = Runtime.getRuntime( ).availableProcessors( );
-		System.out.println( "Number of cores:\t" + nProc );
+    	logger.log( Level.INFO, "Number of cores:\t\t\t" + nProc );
 
 		simulatorCount = Math.min( nProc + 1, nBodies );
 		simulatorPool = new Simulator[ simulatorCount ];
 		for ( int i = 0; i < simulatorCount; i++ )
 			simulatorPool[ i ] = new Simulator( bounds );
-		System.out.println( "Number of simulators:\t" + simulatorCount );
+		logger.log( Level.INFO, "Number of simulators:\t\t" + simulatorCount );
     }
     
     public class State {
