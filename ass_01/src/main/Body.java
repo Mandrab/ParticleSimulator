@@ -90,19 +90,27 @@ public class Body {
      */
     public void checkAndSolveBoundaryCollision(Boundary bounds){
     	double x = pos.getX();
-    	double y = pos.getY();    	
-        if (x > bounds.getX1()){
-            pos.change(bounds.getX1(), pos.getY());
-            vel.change(-vel.getX(), vel.getY());
-        } else if (x < bounds.getX0()){
-            pos.change(bounds.getX0(), pos.getY());
-            vel.change(-vel.getX(), vel.getY());
-        } else if (y > bounds.getY1()){
-            pos.change(pos.getX(), bounds.getY1());
-            vel.change(vel.getX(), -vel.getY());
-        } else if (y < bounds.getY0()){
-            pos.change(pos.getX(), bounds.getY0());
-            vel.change(vel.getX(), -vel.getY());
+    	double y = pos.getY();   
+    	double bx0 = bounds.getX0();
+    	double bx1 = bounds.getX1();
+    	double by0 = bounds.getY0();
+    	double by1 = bounds.getY1();
+    	double velx = vel.getX();
+    	double vely = vel.getY();
+    	
+    	
+        if (x > bx1){
+            pos.change(bx1, y);
+            vel.change(-velx, vely);
+        } else if (x < bx0){
+            pos.change(bx0, y);
+            vel.change(-velx, vely);
+        } else if (y > by1){
+            pos.change(x, by1);
+            vel.change(velx, -vely);
+        } else if (y < by0){
+            pos.change(x, by0);
+            vel.change(velx, -vely);
         }
     }
     
