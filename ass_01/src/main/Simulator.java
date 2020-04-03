@@ -77,23 +77,23 @@ public class Simulator {
 				        secondBall = bodies[ j ];
 
 				        if ( firstBall.collideWith( secondBall ) ) {
-				        	conflictArray[ conflictArrayIdx ] = secondBall;
+				        	conflictArray[ conflictArrayIdx++ ] = secondBall;
 						}
 					}
 
 					if ( conflictArrayIdx != 0 ) {
 						firstBall.locked( );
-			        	//synchronized ( firstBall ) {
-					        for ( int k = 0; k < conflictArrayIdx; k++ ) {
-					        	secondBall = conflictArray[ conflictArrayIdx ];
-					        	secondBall.locked( );
-								//synchronized ( secondBall ) {
-						    		Body.solveCollision( firstBall, secondBall );
-						    		secondBall.unlocked( );
-					        	//}
-							}
-					        firstBall.unlocked( );
-				        //}
+
+				        for ( int k = 0; k < conflictArrayIdx; k++ ) {
+				        	secondBall = conflictArray[ k ];
+				        	secondBall.locked( );
+
+				    		Body.solveCollision( firstBall, secondBall );
+
+				    		secondBall.unlocked( );
+						}
+				        firstBall.unlocked( );
+
 			        }
 		        }
 
