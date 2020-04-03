@@ -71,8 +71,15 @@ public class Body {
      * @return
      */
     public boolean collideWith(Body b) {
-    	double distance = getDistance(b);
-    	return distance < radius + b.getRadius();
+    	double dx = Math.abs( pos.getX( ) - b.getPos( ).getX( ) );
+    	
+    	if ( dx > 0.02 ) return false;
+
+    	double dy = Math.abs( pos.getY( ) - b.getPos( ).getY( ) );
+    	
+    	if ( dy > 0.02 ) return false;
+    	
+    	return dx*dx + dy*dy < 0.02*0.02;
     }
     
     /**
