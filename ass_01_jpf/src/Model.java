@@ -4,11 +4,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import main.Body;
-import main.Boundary;
 import main.Position;
-import main.Simulator;
 import main.Velocity;
-import main.Model.State;
 
 public class Model {
 
@@ -56,9 +53,9 @@ public class Model {
 			simulator.start( nSteps, barrier );
 		}
         
-        for ( Simulator simulator : simulatorPool ) {
+        /*for ( Simulator simulator : simulatorPool ) {
         	simulator.join( );
-		}
+		}*/
     }
     
     private void addBalls( int nBodies ) {

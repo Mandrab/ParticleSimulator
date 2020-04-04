@@ -1,11 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import gov.nasa.jpf.vm.Verify;
 import main.Body;
-import main.Boundary;
 
 public class Simulator {
 
