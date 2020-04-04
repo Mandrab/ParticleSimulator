@@ -2,6 +2,7 @@ package main;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.logging.Level;
 
 /*
  * possibilita'� di eseguire il calcolo del solveCollision fuori sezione critica
@@ -58,9 +59,9 @@ public class Simulator {
 				        secondBall = bodies[ j ];
 
 				        if ( firstBall.collideWith( secondBall ) ) {
-				        	//try {
+				        	try {
 				        		conflictArray[ conflictArrayIdx++ ] = secondBall;
-				        	/*} catch ( ArrayIndexOutOfBoundsException e ) {
+				        	} catch ( ArrayIndexOutOfBoundsException e ) {
 				        		logger.log( Level.WARNING, e.toString( ) );
 
 								conflictArrayIdx--;
@@ -76,11 +77,11 @@ public class Simulator {
 				        		firstBall.unlocked( );
 				        		
 				        		conflictArrayIdx = 0;
-				        	}*/
+				        	}
 						}
 					}
 
-					if ( conflictArrayIdx != 0 ) {
+					if ( conflictArrayIdx > 0 ) {
 						firstBall.locked( );
 
 				        for ( int k = 0; k < conflictArrayIdx; k++ ) {
