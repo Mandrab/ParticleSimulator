@@ -76,7 +76,9 @@ public class Simulator {
 						    		secondBall.unlocked( );
 								}
 				        		firstBall.unlocked( );
-				        		conflictArrayIdx = 0;
+
+				        		conflictArray[ 0 ] = secondBall;
+				        		conflictArrayIdx = 1;
 				        	}
 						}
 					}
