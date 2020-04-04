@@ -63,7 +63,7 @@ public class Simulator {
 				        	/*} catch ( ArrayIndexOutOfBoundsException e ) {
 				        		logger.log( Level.WARNING, e.toString( ) );
 
-				        		conflictArrayIdx--;
+								conflictArrayIdx--;
 				        		firstBall.locked( );
 				        		for ( int k = 0; k < conflictArrayIdx; k++ ) {
 						        	secondBall = conflictArray[ k ];
@@ -74,6 +74,8 @@ public class Simulator {
 						    		secondBall.unlocked( );
 								}
 				        		firstBall.unlocked( );
+				        		
+				        		conflictArrayIdx = 0;
 				        	}*/
 						}
 					}
