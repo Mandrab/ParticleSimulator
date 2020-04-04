@@ -35,6 +35,8 @@ public class Simulator {
 	public void start( int nSteps, CyclicBarrier barrier ) {
 		
 		thread = new Thread( ( ) -> {
+			
+			int conflictArrayIdx = 0;
 
 	        for ( int step = 0; step < nSteps; step++ ) {			// loop for number of iteration
 
@@ -53,7 +55,6 @@ public class Simulator {
 
 	        	for ( Integer i : indexes ) {
 			    	firstBall = bodies[ i ];
-			    	int conflictArrayIdx = 0;
 
 					for ( int j = i + 1; j < bodiesSize; j++ ) {
 				        secondBall = bodies[ j ];
@@ -75,7 +76,6 @@ public class Simulator {
 						    		secondBall.unlocked( );
 								}
 				        		firstBall.unlocked( );
-				        		
 				        		conflictArrayIdx = 0;
 				        	}
 						}
@@ -94,6 +94,7 @@ public class Simulator {
 						}
 
 				        firstBall.unlocked( );
+				        conflictArrayIdx = 0;
 			        }
 		        }
 
