@@ -8,8 +8,11 @@ import java.util.concurrent.CyclicBarrier;
  * 	-> check variazione nelle prestazioni
  */
 public class Simulator {
+	
+	private static final GlobalLogger logger = GlobalLogger.get( );
 
 	private static final double INCREMENT_TIME = 0.1;
+	private static final int CONFLICT_ARRAY_SIZE = 20;
 
 	private Thread thread;
 
@@ -17,28 +20,26 @@ public class Simulator {
 
 	private int bodiesSize;
 	private Body[] bodies;		// bodies in the field
-	private int startIdx;
-	private int stopIdx;
+	private int[] indexes;
 	
+	private Body[] conflictArray;
+
 	private double virtualTime;
 
 	public Simulator( Boundary bounds ) {
 		this.bounds = bounds;
+		this.conflictArray = new Body[ CONFLICT_ARRAY_SIZE ];
 	}
 
 	public void start( int nSteps, CyclicBarrier barrier ) {
-
-		virtualTime = 0;
 		
 		thread = new Thread( ( ) -> {
-
-			final Body[] conflictArray = new Body[ 20 ];
 
 	        for ( int step = 0; step < nSteps; step++ ) {			// loop for number of iteration
 
 	        	// compute bodies new pos
-	        	for ( int i = startIdx; i < stopIdx; i++ )
-	        		bodies[ i ].updatePos( INCREMENT_TIME );
+	        	for ( int i = 0; i < indexes.length; i++ )
+		        	bodies[ indexes[ i ] ].updatePos( INCREMENT_TIME );
 
 	        	try {
 					barrier.await( );
@@ -49,27 +50,7 @@ public class Simulator {
 	        	// check collisions
 	        	Body firstBall, secondBall;
 
-			    /*for ( int i = startIdx; i < stopIdx; i++ ) {
-			    	firstBall = bodies[ i ];
-			    	int xi = 0;
-					for ( int j = i + 1; j < bodiesSize; j++ ) {
-				        secondBall = bodies[ j ];
-				        
-				        if ( firstBall.collideWith( secondBall ) ) {
-				        	//firstBall.locked( );
-				        	//secondBall.locked( );
-				        	synchronized ( firstBall ) {
-								synchronized ( secondBall ) {
-						    		Body.solveCollision( firstBall, secondBall );
-					        	}
-							}
-				        	//firstBall.unlocked( );
-				        	//secondBall.unlocked( );
-						}
-					}
-		        }*/
-
-			    for ( int i = startIdx; i < stopIdx; i++ ) {
+	        	for ( Integer i : indexes ) {
 			    	firstBall = bodies[ i ];
 			    	int conflictArrayIdx = 0;
 
@@ -77,7 +58,23 @@ public class Simulator {
 				        secondBall = bodies[ j ];
 
 				        if ( firstBall.collideWith( secondBall ) ) {
-				        	conflictArray[ conflictArrayIdx++ ] = secondBall;
+				        	//try {
+				        		conflictArray[ conflictArrayIdx++ ] = secondBall;
+				        	/*} catch ( ArrayIndexOutOfBoundsException e ) {
+				        		logger.log( Level.WARNING, e.toString( ) );
+
+				        		conflictArrayIdx--;
+				        		firstBall.locked( );
+				        		for ( int k = 0; k < conflictArrayIdx; k++ ) {
+						        	secondBall = conflictArray[ k ];
+						        	secondBall.locked( );
+
+						    		Body.solveCollision( firstBall, secondBall );
+
+						    		secondBall.unlocked( );
+								}
+				        		firstBall.unlocked( );
+				        	}*/
 						}
 					}
 
@@ -92,8 +89,8 @@ public class Simulator {
 
 				    		secondBall.unlocked( );
 						}
-				        firstBall.unlocked( );
 
+				        firstBall.unlocked( );
 			        }
 		        }
 
@@ -102,11 +99,11 @@ public class Simulator {
 				} catch ( InterruptedException | BrokenBarrierException e ) {
 					e.printStackTrace( );
 				}
-			    
+
 			    // check boundaries
-			    for ( int i = startIdx; i < stopIdx; i++ )
-	        		bodies[ i ].checkAndSolveBoundaryCollision( bounds );
-			    
+			    for ( int i = 0; i < indexes.length; i++ )
+	        		bodies[ indexes[ i ] ].checkAndSolveBoundaryCollision( bounds );
+
 			    virtualTime += INCREMENT_TIME;
 	        }
 		} );
@@ -114,11 +111,10 @@ public class Simulator {
 		thread.start( );
 	}
 
-	public void setBodies( Body[] bodies, int startIdx, int quantity ) {
+	public void setBodies( Body[] bodies, int[] indexes ) {
 		this.bodiesSize = bodies.length;
 		this.bodies = bodies;
-		this.startIdx = startIdx;
-		this.stopIdx = startIdx + quantity;
+		this.indexes = indexes;
 	}
 
 	public void join( ) throws InterruptedException {

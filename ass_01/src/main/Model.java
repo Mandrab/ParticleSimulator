@@ -36,22 +36,30 @@ public class Model {
     	addBalls( nBodies );						// generate nBodies balls
 
     	createSimulators( nBodies );					// create right number of simulators (thread)
-    	
-    	final int forNum = nBodies < simulatorCount ? 1
-    			: nBodies / simulatorCount;
+
+    	final int forNum = nBodies / simulatorCount;
     	logger.log( Level.INFO, "Bodies for simulator:\t\t" + forNum );
 
-    	int simulatorIdx = 0;
+    	final int remainingItems = nBodies % simulatorCount;
+    	if ( nBodies % simulatorCount != 0 )
+        	logger.log( Level.INFO, "Bodies for last simulator: \t" + ( forNum + remainingItems ) );
 
-        for( int fromIdx = 0; simulatorIdx < simulatorCount; simulatorIdx++ ) {
-        	simulatorPool[ simulatorIdx ].setBodies( bodies, fromIdx, forNum );
-        	fromIdx += forNum;
-        }
+    	final List<int[]> simulatorsIndexes = new ArrayList<>( );
+    	for ( int i = 0; i < simulatorCount -1; i++ ) {
+    		simulatorsIndexes.add( new int[ forNum ] );
+    	}
+    	simulatorsIndexes.add( new int[ forNum + remainingItems ] );
 
-        if ( nBodies % simulatorCount != 0 ) {
-        	final int bodiesForLast = forNum + nBodies % simulatorCount;
-        	simulatorPool[ --simulatorIdx ].setBodies( bodies, simulatorIdx * forNum, bodiesForLast );
-        	logger.log( Level.INFO, "Bodies for last simulator: \t" + bodiesForLast );
+    	for ( int i = 0, j = 0; i < nBodies - remainingItems; i++ ) {
+    		simulatorsIndexes.get( i % simulatorCount )[ j ] = i;
+    		if ( i % simulatorCount == simulatorCount -1 ) j++;
+    	}
+    	for ( int i = nBodies - remainingItems, j = 0; i < nBodies; i++ ) {
+    		simulatorsIndexes.get( simulatorCount -1 )[ j++ ] = i;
+    	}
+
+        for( int i = 0; i < simulatorCount; i++ ) {
+        	simulatorPool[ i ].setBodies( bodies, simulatorsIndexes.get( i ) );
         }
 
         run.set( true );
@@ -82,7 +90,6 @@ public class Model {
 				ballsPositions.add( new Position( body.getPos( ).getX( ), body.getPos( ).getY( ) ) );
 			}
         	actualState = new State( nSteps, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
-			//}
         } );
 
         for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, barrier );
