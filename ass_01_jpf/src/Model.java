@@ -1,45 +1,82 @@
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import main.Body;
+import main.Boundary;
+import main.Position;
+import main.Simulator;
+import main.Velocity;
+import main.Model.State;
 
 public class Model {
 
-	private List<Simulator> simulatorPool;
-	private List<Body> bodies;				// bodies in the field
-
+	private Simulator[] simulatorPool;
+	private Body[] bodies;				// bodies in the field
+	private int simulatorCount;
+	private Lock lock = new ReentrantLock();
+	
     public Model( ) {
-
-        final int nProc = Runtime.getRuntime( ).availableProcessors( );
-		System.out.println( "N cores: " + nProc );
-
-		simulatorPool = new ArrayList<Simulator>( );
-		
-		for ( int i = 0; i < nProc + 1; i++ )
-			simulatorPool.add( new Simulator( ) );
     }
+    
+    public void initialize( int nBodies) {
 
-    public void execute( int nBodies, int nSteps ) {
+    	bodies = new Body[nBodies];
+    	addBalls( nBodies );
 
-    	bodies = new ArrayList<Body>( );
-    	for ( int i = 0; i < nBodies; i++ )
-    		bodies.add( new Body( ) );
+    	createSimulators( nBodies );					// create right number of simulators (thread)
+    	
+    	final int forNum = nBodies < simulatorCount ? 1
+    			: nBodies / simulatorCount;
 
-        int increment = bodies.size( ) / simulatorPool.size( ) - 1;
+    	int simulatorIdx = 0;
 
-        int toIdx, fromIdx = 0;
-        
-        if ( bodies.size( ) < simulatorPool.size( ) ) {
-        	increment = 1;
-        	toIdx = 1;
-        } else
-        	toIdx = increment + bodies.size( ) - simulatorPool.size( ) * increment;
-
-        for( int i = 0; i < simulatorPool.size( ) && i < bodies.size( ); i++ ) {
-        	simulatorPool.get( i ).setBodies( bodies.subList( fromIdx, toIdx ) );
-        	fromIdx = toIdx;
-        	toIdx += increment;
+        for( int fromIdx = 0; simulatorIdx < simulatorCount; simulatorIdx++ ) {
+        	simulatorPool[ simulatorIdx ].setBodies( bodies, fromIdx, forNum );
+        	fromIdx += forNum;
         }
 
-        final CyclicBarrier barrier = new CyclicBarrier( simulatorPool.size( ) );
-        simulatorPool.forEach( simulator -> simulator.start( nSteps, barrier ) );
+        if ( nBodies % simulatorCount != 0 ) {
+        	final int bodiesForLast = forNum + nBodies % simulatorCount;
+        	simulatorPool[ --simulatorIdx ].setBodies( bodies, simulatorIdx * forNum, bodiesForLast );
+        }
+    }
+    
+    public void execute( int nSteps ) throws InterruptedException{
+    	
+    	final CyclicBarrier barrier = new CyclicBarrier( simulatorCount, ( ) -> {
+        		List<Position> ballsPositions = new ArrayList<>( );
+            	for ( Body body : bodies ) {
+    				ballsPositions.add( new Position( body.getPos( ).getX( ), body.getPos( ).getY( ) ) );
+    			}
+        } );
+
+        for ( Simulator simulator : simulatorPool ) {
+			simulator.start( nSteps, barrier );
+		}
+        
+        for ( Simulator simulator : simulatorPool ) {
+        	simulator.join( );
+		}
+    }
+    
+    private void addBalls( int nBodies ) {
+
+        for ( int i = 0; i < nBodies; i++ ) {
+           
+            Body b = new Body( new Position( 0, 0 ), new Velocity( 00, Math.sqrt( 1 - 0 ) * 0 ), 0.01, lock );
+            bodies[ i ] = b;
+        }
+    }
+    
+    private void createSimulators(int nBodies) {
+    	
+    	final int nProc = Runtime.getRuntime( ).availableProcessors( );
+
+		simulatorCount = Math.min( nProc + 1, nBodies );
+		simulatorPool = new Simulator[ simulatorCount ];
+		for ( int i = 0; i < simulatorCount; i++ )
+			simulatorPool[ i ] = new Simulator( );
     }
 }

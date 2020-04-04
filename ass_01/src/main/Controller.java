@@ -83,7 +83,7 @@ public class Controller {
     	model.initialize( nBodies );
 
     	if ( launchGui ) viewUpdater.start( );
-
+    	
     	while ( ! run ) Thread.sleep( REFRESH_RATE );
 
     	long startTime = System.currentTimeMillis( );

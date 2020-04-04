@@ -5,9 +5,11 @@
  */
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException{
 
     	Model model = new Model( );
-        model.execute( 5, 10 );
+    	model.initialize( 1000 );
+        model.execute( 1000 );
+		
     }
 }

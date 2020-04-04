@@ -33,6 +33,7 @@ public class View extends JFrame implements ActionListener{
 	private JButton buttonStart;
 	private JButton buttonStop;
 	private JPanel buttonPanel;
+	private static JTextField text;
     
     /**
      * Creates a view of the specified size (in pixels)
@@ -61,13 +62,16 @@ public class View extends JFrame implements ActionListener{
 			}
 		} );
 
+        text = new JTextField("Bodies: " + 0 + " - virtual: " + 0.0 + " - numberIter: " + 0.0);
+        text.setEditable(false);
         buttonStart = new JButton( "start" );
         buttonStart.addActionListener( this );
 
         buttonStop = new JButton( "stop" );
         buttonStop.addActionListener( this );
-
+        
         buttonPanel = new JPanel( );
+        buttonPanel.add(text);
         buttonPanel.add( this.buttonStart );
         buttonPanel.add( this.buttonStop );
         buttonPanel.setPreferredSize( new Dimension( WIDTH, buttonPanel.getPreferredSize( ).height ) );
@@ -93,7 +97,6 @@ public class View extends JFrame implements ActionListener{
 
 		private List<Position> bodies = new ArrayList<Position>( );
     	private long nIter;
-    	private double vt;
     	
         private long dx;
         private long dy;
@@ -106,7 +109,7 @@ public class View extends JFrame implements ActionListener{
 
         public void paint( Graphics g ) {
     		Graphics2D g2 = ( Graphics2D ) g;
-
+    		
     		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING,
     		          RenderingHints.VALUE_ANTIALIAS_ON );
     		g2.setRenderingHint( RenderingHints.KEY_RENDERING,
@@ -119,14 +122,16 @@ public class View extends JFrame implements ActionListener{
 		        int y0 = ( int )( dy - b.getY( ) * dy );
 		        g2.drawOval( x0, y0, ( int )( rad * dx * 2 ), ( int )( rad * dy * 2 ) );
 		    } );
-    		String time = String.format( "%.2f", vt );
-    		g2.drawString( "Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter, 2, 20 );
+    		//String time = String.format( "%.2f", vt );
+    		//g2.drawString( "Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter, 2, 10 );
         }
         
         public void display( List<Position> bodies, double vt, long iter ) {
             this.bodies = bodies;
-            this.vt = vt;
+            //this.vt = vt;
             this.nIter = iter;
+            String time = String.format( "%.2f", vt );
+            text.setText("Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter);
         	repaint( );
         }
     }
