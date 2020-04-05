@@ -8,28 +8,28 @@ import java.util.concurrent.locks.Lock;
  */
 public class Body {
     
-    private Position pos;
-    private Velocity vel;
+    private Position position;
+    private Velocity speed;
     private double radius;
     private Lock myLock;
     
-    public Body(Position pos, Velocity vel, double radius, Lock lock){
-        this.pos = pos;
-        this.vel = vel;
+    public Body( Position position, Velocity speed, double radius, Lock lock ) {
+        this.position = position;
+        this.speed = speed;
         this.radius = radius;
         this.myLock = lock;
     }
     
-    public double getRadius() {
+    public double getRadius( ) {
     	return radius;
     }
     
-    public Position getPos(){
-        return pos;
+    public Position getPos( ) {
+        return position;
     }
 
-    public Velocity getVel(){
-        return vel;
+    public Velocity getVel( ) {
+        return speed;
     }
     
     /**
@@ -37,10 +37,10 @@ public class Body {
      * 
      * @param dt time elapsed 
      */
-    public void updatePos(double dt){    	
-    	double newPosX = pos.getX() + vel.getX()*dt;
-    	double newPosY = pos.getY() + vel.getY()*dt;
-    	pos.change(newPosX, newPosY);
+    public void updatePos( double dt ) {    	
+    	double newPosX = position.getX( ) + speed.getX( ) * dt;
+    	double newPosY = position.getY( ) + speed.getY( ) * dt;
+    	position.change( newPosX, newPosY );
     }
 
     /**
@@ -49,20 +49,8 @@ public class Body {
      * @param vx
      * @param vy
      */
-    public void changeVel(double vx, double vy){
-    	vel.change(vx, vy);
-    }
-  	
-    /**
-     * Computes the distance from the specified body
-     * 
-     * @param b
-     * @return
-     */
-    public double getDistance(Body b) {
-    	double dx = pos.getX() - b.getPos().getX();
-    	double dy = pos.getY() - b.getPos().getY();
-    	return Math.sqrt(dx*dx + dy*dy);
+    public void changeVel( double vx, double vy ){
+    	speed.change( vx, vy );
     }
 
     /**
@@ -71,11 +59,11 @@ public class Body {
      * @return
      */
     public boolean collideWith(Body b) {
-    	double dx = Math.abs( pos.getX( ) - b.getPos( ).getX( ) );
+    	double dx = Math.abs( position.getX( ) - b.getPos( ).getX( ) );
     	
     	if ( dx > 0.02 ) return false;
 
-    	double dy = Math.abs( pos.getY( ) - b.getPos( ).getY( ) );
+    	double dy = Math.abs( position.getY( ) - b.getPos( ).getY( ) );
     	
     	if ( dy > 0.02 ) return false;
     	
@@ -89,28 +77,28 @@ public class Body {
      * @param bounds
      */
     public void checkAndSolveBoundaryCollision(Boundary bounds){
-    	double x = pos.getX();
-    	double y = pos.getY();   
+    	double x = position.getX();
+    	double y = position.getY();   
     	double bx0 = bounds.getX0();
     	double bx1 = bounds.getX1();
     	double by0 = bounds.getY0();
     	double by1 = bounds.getY1();
-    	double velx = vel.getX();
-    	double vely = vel.getY();
+    	double velx = speed.getX();
+    	double vely = speed.getY();
     	
     	
         if (x > bx1){
-            pos.change(bx1, y);
-            vel.change(-velx, vely);
+            position.change(bx1, y);
+            speed.change(-velx, vely);
         } else if (x < bx0){
-            pos.change(bx0, y);
-            vel.change(-velx, vely);
+            position.change(bx0, y);
+            speed.change(-velx, vely);
         } else if (y > by1){
-            pos.change(x, by1);
-            vel.change(velx, -vely);
+            position.change(x, by1);
+            speed.change(velx, -vely);
         } else if (y < by0){
-            pos.change(x, by0);
-            vel.change(velx, -vely);
+            position.change(x, by0);
+            speed.change(velx, -vely);
         }
     }
     

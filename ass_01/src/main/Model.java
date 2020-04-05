@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 import main.builders.BodiesDistributorBuilder;
 import main.builders.BodiesDistributorBuilder.Trait;
+import main.builders.SimulatorsPoolBuilder;
 
 public class Model {
 
@@ -35,13 +36,13 @@ public class Model {
 
     public void initialize( int nBodies ) {
 
-    	bodies = new Body[ nBodies ];
-    	addBalls( nBodies );						// generate nBodies balls
+    	bodies = allocateBalls( nBodies );						// generate nBodies balls
 
-    	createSimulators( nBodies );					// create right number of simulators (thread)
+    	simulatorPool = SimulatorsPoolBuilder.getOptimizedNum( bounds, nBodies, true ); // create right number of simulators (thread)
+    	simulatorCount = simulatorPool.length;
 
     	for ( int idx = 0; idx < simulatorCount; idx++ ) {
-    		simulatorPool[ idx ].setWorkspace( bodies, BodiesDistributorBuilder.get( idx, simulatorCount, Trait.BALANCED_CALCS ) );
+    		simulatorPool[ idx ].setWorkspace( bodies, BodiesDistributorBuilder.get( idx, simulatorCount, Trait.INDEX_RANGE ) );
 		}
 
         run.set( true );
@@ -80,6 +81,14 @@ public class Model {
 
         running = false;
     }
+    
+    public State getState( ) {
+    	return actualState;
+    }
+    
+    public boolean isRunning( ) {
+    	return running;
+    }
 
     public void start( ) {
     	synchronized ( run ) {
@@ -93,16 +102,16 @@ public class Model {
     		run.set( false );
     	}
     }
-
-    public boolean isRunning( ) {
-    	return running;
+    
+    public void stop( ) {
+    	synchronized ( run ) {
+    		run.set( false );
+    	}
     }
 
-    public State getState( ) {
-    	return actualState;
-    }
+    private Body[] allocateBalls( int nBodies ) {
 
-    private void addBalls( int nBodies ) {
+    	final Body[] bodies = new Body[ nBodies ];
 
     	final Random rand = new Random( System.currentTimeMillis( ) );
 
@@ -115,18 +124,8 @@ public class Model {
             Body b = new Body( new Position( x, y ), new Velocity( dx * speed, Math.sqrt( 1 - dx*dx ) * speed ), 0.01, lock );
             bodies[ i ] = b;
         }
-    }
-
-    private void createSimulators( int nBodies ) {
-    	
-    	final int nProc = Runtime.getRuntime( ).availableProcessors( );
-    	logger.log( Level.INFO, "Number of cores:\t\t\t" + nProc );
-
-		simulatorCount = Math.min( nProc + 1, nBodies );
-		simulatorPool = new Simulator[ simulatorCount ];
-		for ( int i = 0; i < simulatorCount; i++ )
-			simulatorPool[ i ] = new Simulator( bounds );
-		logger.log( Level.INFO, "Number of simulators:\t\t" + simulatorCount );
+        
+        return bodies;
     }
     
     public class State {

@@ -24,36 +24,18 @@ public class BodiesDistributorBuilder {
 		return null;
 	}
 	
-	public static class IndexRangeDistributor implements Function<Integer, int[]> {
+	public static abstract class Distributor implements Function<Integer, int[]> {
 
-		private int groupsCount;
-		private int workerIndex;
-		
-		public IndexRangeDistributor( int workerIndex, int groupsCount ) {
+		protected int groupsCount;
+		protected int workerIndex;
+
+		public Distributor( int workerIndex, int groupsCount ) {
 			this.groupsCount = groupsCount;
 			this.workerIndex = workerIndex;
 		}
 
 		@Override
 		public int[] apply( Integer bodiesCount ) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
-	
-	public static class BalancedCalcsDistributor implements Function<Integer, int[]> {
-
-		private int groupsCount;
-		private int workerIndex;
-		
-		public BalancedCalcsDistributor( int workerIndex, int groupsCount ) {
-			this.groupsCount = groupsCount;
-			this.workerIndex = workerIndex;
-		}
-
-		@Override
-		public int[] apply( Integer bodiesCount ) {
-
 			final int forNum = bodiesCount / groupsCount;
 			final int remainingItems = bodiesCount % groupsCount;
 
@@ -67,6 +49,44 @@ public class BodiesDistributorBuilder {
 					indexes = new int[ forNum + remainingItems ];
 				}
 			}
+
+			return getFilledArray( indexes, bodiesCount, forNum, remainingItems );
+		}
+
+		public abstract int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems );
+	}
+	
+	public static class IndexRangeDistributor extends Distributor {
+		
+		public IndexRangeDistributor( int workerIndex, int groupsCount ) {
+			super( workerIndex, groupsCount );
+		}
+
+		@Override
+		public int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems ) {
+
+			int startIndex = workerIndex * ( int ) ( bodiesCount / groupsCount );
+
+			for( int i = 0; i < forNum; i++ ) {
+	        	indexes[ i ] = startIndex++;
+	        }
+
+			if ( workerIndex == groupsCount -1 )
+				for ( int i = forNum; i < forNum + remainingItems; i++ )
+					indexes[ i ] = startIndex++;
+
+			return indexes;
+		}
+	}
+	
+	public static class BalancedCalcsDistributor extends Distributor {
+		
+		public BalancedCalcsDistributor( int workerIndex, int groupsCount ) {
+			super( workerIndex, groupsCount );
+		}
+
+		@Override
+		public int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems ) {
 
 	    	for ( int i = 0; i < forNum / 2; i++ ) {
     			int idx = workerIndex + groupsCount * i;
@@ -83,20 +103,26 @@ public class BodiesDistributorBuilder {
 		}
 	}
 	
-	public static class NearestBalancedCalcsDistributor implements Function<Integer, int[]> {
-
-		private int groupsCount;
-		private int workerIndex;
+	public static class NearestBalancedCalcsDistributor extends Distributor {
 		
 		public NearestBalancedCalcsDistributor( int workerIndex, int groupsCount ) {
-			this.groupsCount = groupsCount;
-			this.workerIndex = workerIndex;
+			super( workerIndex, groupsCount );
 		}
 
 		@Override
-		public int[] apply( Integer bodiesCount ) {
-			// TODO Auto-generated method stub
-			return null;
+		public int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems ) {
+
+			int bodyIndex = workerIndex;
+			for ( int i = 0; i < forNum; i++ ) {
+				indexes[ i ] = bodyIndex;
+				bodyIndex += groupsCount;
+			}
+
+			if ( workerIndex == groupsCount -1 )
+				for ( int i = 0, j = bodyIndex - groupsCount; i < remainingItems; i++ )
+					indexes[ forNum + i ] = ++j;
+
+	    	return indexes;
 		}
 	}
 }
