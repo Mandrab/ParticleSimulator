@@ -45,17 +45,21 @@ public class Model {
         	logger.log( Level.INFO, "Bodies for last simulator: \t" + ( forNum + remainingItems ) );
 
     	final List<int[]> simulatorsIndexes = new ArrayList<>( );
-    	for ( int i = 0; i < simulatorCount -1; i++ ) {
+    	simulatorsIndexes.add( new int[ forNum + remainingItems ] );
+    	for ( int i = 1; i < simulatorCount; i++ ) {
     		simulatorsIndexes.add( new int[ forNum ] );
     	}
-    	simulatorsIndexes.add( new int[ forNum + remainingItems ] );
 
-    	for ( int i = 0, j = 0; i < nBodies - remainingItems; i++ ) {
-    		simulatorsIndexes.get( i % simulatorCount )[ j ] = i;
-    		if ( i % simulatorCount == simulatorCount -1 ) j++;
+    	for ( int i = 0; i < forNum / 2; i++ ) {
+    		for (int j = 0; j < simulatorCount; j++) {
+    			int[] simulatorIndexes = simulatorsIndexes.get( j );
+    			int idx = j + simulatorCount * i;
+				simulatorIndexes[ i ] = idx;
+				simulatorIndexes[ forNum - i -1 ] = nBodies - idx -1;
+			}
     	}
-    	for ( int i = nBodies - remainingItems, j = 0; i < nBodies; i++ ) {
-    		simulatorsIndexes.get( simulatorCount -1 )[ j++ ] = i;
+    	for ( int i = 0, j = forNum; i < remainingItems; i++ ) {
+    		simulatorsIndexes.get( 0 )[ j++ ] = i + nBodies / 2;
     	}
 
         for( int i = 0; i < simulatorCount; i++ ) {
