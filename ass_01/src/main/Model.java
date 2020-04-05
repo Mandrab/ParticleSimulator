@@ -7,19 +7,22 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
+import main.builders.BodiesDistributorBuilder;
+import main.builders.BodiesDistributorBuilder.Trait;
+
 public class Model {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );
 
-	private boolean running;
-	private State actualState;
+	private boolean running;							// model state
+	private State actualState;							// model's element state ( iteration, virtual time, bodies positions )
 
-	private AtomicBoolean run;
+	private AtomicBoolean run;							// intention
 
 	private int simulatorCount;
 	private Simulator[] simulatorPool;
-	private Body[] bodies;							// bodies in the field
-	private Boundary bounds;						// boundary of the field
+	private Body[] bodies;								// bodies in the field
+	private Boundary bounds;							// boundary of the field
 	private Lock lock = new ReentrantLock( );
 
 	public Model( ) {
@@ -37,34 +40,9 @@ public class Model {
 
     	createSimulators( nBodies );					// create right number of simulators (thread)
 
-    	final int forNum = nBodies / simulatorCount;
-    	logger.log( Level.INFO, "Bodies for simulator:\t\t" + forNum );
-
-    	final int remainingItems = nBodies % simulatorCount;
-    	if ( nBodies % simulatorCount != 0 )
-        	logger.log( Level.INFO, "Bodies for last simulator: \t" + ( forNum + remainingItems ) );
-
-    	final List<int[]> simulatorsIndexes = new ArrayList<>( );
-    	simulatorsIndexes.add( new int[ forNum + remainingItems ] );
-    	for ( int i = 1; i < simulatorCount; i++ ) {
-    		simulatorsIndexes.add( new int[ forNum ] );
-    	}
-
-    	for ( int i = 0; i < forNum / 2; i++ ) {
-    		for (int j = 0; j < simulatorCount; j++) {
-    			int[] simulatorIndexes = simulatorsIndexes.get( j );
-    			int idx = j + simulatorCount * i;
-				simulatorIndexes[ i ] = idx;
-				simulatorIndexes[ forNum - i -1 ] = nBodies - idx -1;
-			}
-    	}
-    	for ( int i = 0, j = forNum; i < remainingItems; i++ ) {
-    		simulatorsIndexes.get( 0 )[ j++ ] = i + nBodies / 2;
-    	}
-
-        for( int i = 0; i < simulatorCount; i++ ) {
-        	simulatorPool[ i ].setBodies( bodies, simulatorsIndexes.get( i ) );
-        }
+    	for ( int idx = 0; idx < simulatorCount; idx++ ) {
+    		simulatorPool[ idx ].setWorkspace( bodies, BodiesDistributorBuilder.get( idx, simulatorCount, Trait.BALANCED_CALCS ) );
+		}
 
         run.set( true );
     }
@@ -96,7 +74,7 @@ public class Model {
         	actualState = new State( nSteps, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
         } );
 
-        for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, barrier );
+        for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, barrier, barrier );
 
         for ( Simulator simulator : simulatorPool ) simulator.join( );
 

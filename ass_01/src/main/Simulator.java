@@ -2,6 +2,7 @@ package main;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 /*
@@ -19,10 +20,9 @@ public class Simulator {
 
 	private Boundary bounds;
 
-	private int bodiesSize;
 	private Body[] bodies;		// bodies in the field
-	private int[] indexes;
-	
+	private Function<Integer, int[]> indexesSupplier;
+
 	private Body[] conflictArray;
 
 	private double virtualTime;
@@ -32,31 +32,37 @@ public class Simulator {
 		this.conflictArray = new Body[ CONFLICT_ARRAY_SIZE ];
 	}
 
-	public void start( int nSteps, CyclicBarrier barrier ) {
-		
+	public void start( int nSteps, CyclicBarrier firstBarrier, CyclicBarrier secondBarrier ) {
+
 		thread = new Thread( ( ) -> {
-			
+
+			final int bodiesCount = bodies.length;
+
+			final int[] indexes = indexesSupplier.apply( bodiesCount );
+			final int indexesCount = indexes.length;
+
 			int conflictArrayIdx = 0;
+
+        	Body firstBall, secondBall;
+
 
 	        for ( int step = 0; step < nSteps; step++ ) {			// loop for number of iteration
 
-	        	// compute bodies new pos
-	        	for ( int i = 0; i < indexes.length; i++ )
+	        	// compute new bodies positions
+	        	for ( int i = 0; i < indexesCount; i++ )
 		        	bodies[ indexes[ i ] ].updatePos( INCREMENT_TIME );
 
 	        	try {
-					barrier.await( );
+	        		firstBarrier.await( );
 				} catch ( InterruptedException | BrokenBarrierException e ) {
 					e.printStackTrace( );
 				}
 
-	        	// check collisions
-	        	Body firstBall, secondBall;
-
+				// check collisions
 	        	for ( Integer i : indexes ) {
 			    	firstBall = bodies[ i ];
 
-					for ( int j = i + 1; j < bodiesSize; j++ ) {
+					for ( int j = i + 1; j < bodiesCount; j++ ) {
 				        secondBall = bodies[ j ];
 
 				        if ( firstBall.collideWith( secondBall ) ) {
@@ -101,13 +107,13 @@ public class Simulator {
 		        }
 
 			    try {
-					barrier.await( );
+			    	secondBarrier.await( );
 				} catch ( InterruptedException | BrokenBarrierException e ) {
 					e.printStackTrace( );
 				}
 
 			    // check boundaries
-			    for ( int i = 0; i < indexes.length; i++ )
+			    for ( int i = 0; i < indexesCount; i++ )
 	        		bodies[ indexes[ i ] ].checkAndSolveBoundaryCollision( bounds );
 
 			    virtualTime += INCREMENT_TIME;
@@ -117,17 +123,16 @@ public class Simulator {
 		thread.start( );
 	}
 
-	public void setBodies( Body[] bodies, int[] indexes ) {
-		this.bodiesSize = bodies.length;
+	public void setWorkspace( Body[] bodies, Function<Integer, int[]> indexesSupplier ) {
 		this.bodies = bodies;
-		this.indexes = indexes;
+		this.indexesSupplier = indexesSupplier;
+	}
+	
+	public double getVirtualTime( ) {
+		return virtualTime;
 	}
 
 	public void join( ) throws InterruptedException {
 		thread.join( );
-	}
-
-	public double getVirtualTime( ) {
-		return virtualTime;
 	}
 }
