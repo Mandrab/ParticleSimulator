@@ -24,7 +24,6 @@ public class Model {
 	private Simulator[] simulatorPool;
 	private Body[] bodies;								// bodies in the field
 	private Boundary bounds;							// boundary of the field
-	private Lock lock = new ReentrantLock( );
 
 	public Model( ) {
 		bounds = new Boundary( -1.0, -1.0, 1.0, 1.0 );	// initializing boundary
@@ -121,7 +120,7 @@ public class Model {
             double dx = - 1 + rand.nextDouble( ) * 2;
             double speed = rand.nextDouble( ) * 0.05;
 
-            Body b = new Body( new Position( x, y ), new Velocity( dx * speed, Math.sqrt( 1 - dx*dx ) * speed ), 0.01, lock );
+            Body b = new Body( new Position( x, y ), new Velocity( dx * speed, Math.sqrt( 1 - dx*dx ) * speed ), 0.01, new ReentrantLock() );
             bodies[ i ] = b;
         }
         
