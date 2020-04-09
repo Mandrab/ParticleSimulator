@@ -2,9 +2,9 @@ package main.builders;
 
 import java.util.logging.Level;
 
-import main.Boundary;
-import main.GlobalLogger;
-import main.Simulator;
+import main.controller.GlobalLogger;
+import main.model.Boundary;
+import main.model.Simulator;
 
 public class SimulatorsPoolBuilder {
 
@@ -52,5 +52,14 @@ public class SimulatorsPoolBuilder {
     	int simulatorsCount = Math.min( realProcs + 1, bodiesCount );
 
     	return getQuantity( bounds, simulatorsCount );
+	}
+	
+	public static int getOptimizedNum( int bodiesCount, boolean considerHyperThreading ) {
+
+		final int nProcs = Runtime.getRuntime( ).availableProcessors( );
+		final int realProcs = considerHyperThreading ? nProcs / 2 : nProcs;
+    	logger.log( Level.INFO, "Number of cores:\t\t\t" + realProcs );
+
+    	return Math.min( realProcs + 1, bodiesCount );
 	}
 }

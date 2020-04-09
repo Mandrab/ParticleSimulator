@@ -1,9 +1,12 @@
-package main;
+package main.model;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.logging.Level;
+
+import main.controller.GlobalLogger;
 
 /*
  * possibilita'� di eseguire il calcolo del solveCollision fuori sezione critica
@@ -17,6 +20,7 @@ public class Simulator {
 	private static final int CONFLICT_ARRAY_SIZE = 20;
 
 	private Thread thread;
+	private AtomicBoolean terminated;
 
 	private Boundary bounds;
 
@@ -26,14 +30,19 @@ public class Simulator {
 	private Body[] conflictArray;
 
 	private double virtualTime;
+	
+	private Runnable callback;
 
 	public Simulator( Boundary bounds ) {
 		this.bounds = bounds;
 		this.conflictArray = new Body[ CONFLICT_ARRAY_SIZE ];
+		this.terminated = new AtomicBoolean( );
 	}
 
 	public void start( int nSteps, CyclicBarrier firstBarrier, CyclicBarrier secondBarrier ) {
 
+		terminated.set( false );
+		
 		thread = new Thread( ( ) -> {
 
 			final int bodiesCount = bodies.length;
@@ -44,7 +53,6 @@ public class Simulator {
 			int conflictArrayIdx = 0;
 
         	Body firstBall, secondBall;
-
 
 	        for ( int step = 0; step < nSteps; step++ ) {			// loop for number of iteration
 
@@ -118,6 +126,9 @@ public class Simulator {
 
 			    virtualTime += INCREMENT_TIME;
 	        }
+
+	        terminated.set( true );
+	        if ( callback != null ) callback.run( );
 		} );
 
 		thread.start( );
@@ -128,8 +139,16 @@ public class Simulator {
 		this.indexesSupplier = indexesSupplier;
 	}
 	
+	public void setCallback( Runnable callback ) {
+		this.callback = callback;
+	}
+
 	public double getVirtualTime( ) {
 		return virtualTime;
+	}
+
+	public boolean isTerminated( ) {
+		return terminated.get( );
 	}
 
 	public void join( ) throws InterruptedException {

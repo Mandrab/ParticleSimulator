@@ -1,26 +1,27 @@
-package main;
+package main.model;
 
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 import main.builders.BodiesDistributorBuilder;
 import main.builders.BodiesDistributorBuilder.Trait;
+import main.controller.GlobalLogger;
+import main.controller.Position;
 import main.builders.SimulatorsPoolBuilder;
 
 public class Model {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );
 
-	private boolean running;							// model state
 	private State actualState;							// model's element state ( iteration, virtual time, bodies positions )
 
 	private AtomicBoolean run;							// intention
+	private AtomicInteger steps;
 
-	private int simulatorCount;
 	private Simulator[] simulatorPool;
 	private Body[] bodies;								// bodies in the field
 	private Boundary bounds;							// boundary of the field
@@ -29,83 +30,90 @@ public class Model {
 		bounds = new Boundary( -1.0, -1.0, 1.0, 1.0 );	// initializing boundary
 		actualState = new State( 0, 0, new ArrayList<Position>( ) );
 
-		running = false;
-		run = new AtomicBoolean( false );		
+		run = new AtomicBoolean( );
+		steps = new AtomicInteger( );
 	}
 
-    public void initialize( int nBodies ) {
+    public void initialize( int nBodies, int nSimulators ) {
 
     	bodies = allocateBalls( nBodies );						// generate nBodies balls
 
-    	simulatorPool = SimulatorsPoolBuilder.getOptimizedNum( bounds, nBodies, true ); // create right number of simulators (thread)
-    	simulatorCount = simulatorPool.length;
+    	simulatorPool = SimulatorsPoolBuilder.getQuantity( bounds, nSimulators ); // create simulators (thread) pool
 
-    	for ( int idx = 0; idx < simulatorCount; idx++ ) {
-    		simulatorPool[ idx ].setWorkspace( bodies, BodiesDistributorBuilder.get( idx, simulatorCount, Trait.INDEX_RANGE ) );
+    	for ( int idx = 0; idx < nSimulators; idx++ ) {
+    		simulatorPool[ idx ].setWorkspace( bodies, BodiesDistributorBuilder.get( idx, nSimulators, Trait.INDEX_RANGE ) );
 		}
+
+    	List<Position> ballsPositions = new ArrayList<>( );
+    	for ( Body body : bodies ) ballsPositions.add( body.getPos( ).clone( ) );
+
+    	actualState = new State( 0, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
 
         run.set( true );
     }
 
-    public void execute( int nSteps ) throws InterruptedException {
+    public void execute( int nSteps, Optional<Runnable> callback ) throws InterruptedException {
 
-    	logger.log( Level.INFO, "\nExecuting " + simulatorCount + " simulators\n" );
+    	logger.log( Level.INFO, "\nExecuting " + simulatorPool.length + " simulators\n" );
 
-    	running = true;
-
-    	synchronized( run ) {
-    		while ( ! run.get( ) )
-				try {
-					run.wait( );
-				} catch (InterruptedException e) { e.printStackTrace( ); }
-    	}
-    	
-    	CyclicBarrier barrier = new CyclicBarrier( simulatorCount, ( ) -> {
+    	CyclicBarrier firstBarrier = new CyclicBarrier( simulatorPool.length, ( ) -> {
     		synchronized( run ) {
-        		while ( ! run.get( ) )
+    			while ( ! run.get( ) )
     				try {
     					run.wait( );
     				} catch (InterruptedException e) { e.printStackTrace( ); }
+    			if ( steps.get( ) > 0 )
+    				run.set( false );
         	}
     		List<Position> ballsPositions = new ArrayList<>( );
-        	for ( Body body : bodies ) {
-				ballsPositions.add( new Position( body.getPos( ).getX( ), body.getPos( ).getY( ) ) );
-			}
+        	for ( Body body : bodies ) ballsPositions.add( body.getPos( ).clone( ) );
+
         	actualState = new State( nSteps, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
         } );
+    	CyclicBarrier secondBarrier = new CyclicBarrier( simulatorPool.length );
 
-        for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, barrier, barrier );
+    	callback.ifPresent( runnable -> {
+    	    AtomicInteger counter = new AtomicInteger( );
+    	    for ( Simulator simulator : simulatorPool ) simulator.setCallback( ( ) -> {
+	    		if ( counter.incrementAndGet( ) == simulatorPool.length )
+	    			runnable.run( );
+    	    } );
+    	} );
 
-        for ( Simulator simulator : simulatorPool ) simulator.join( );
+        for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, firstBarrier, secondBarrier );
 
-        running = false;
-    }
-    
-    public State getState( ) {
-    	return actualState;
-    }
-    
-    public boolean isRunning( ) {
-    	return running;
+        if ( ! callback.isPresent( ) )
+        	for ( Simulator simulator : simulatorPool ) simulator.join( );
     }
 
     public void start( ) {
     	synchronized ( run ) {
+    		steps.set( 0 );
     		run.set( true );
         	run.notify( );
 		}
     }
 
-    public void pause( ) {
-    	synchronized ( run ) {
-    		run.set( false );
-    	}
-    }
-    
     public void stop( ) {
     	synchronized ( run ) {
     		run.set( false );
     	}
+    }
+
+    public void step( ) {
+    	synchronized ( run ) {
+    		steps.set( 1 );
+    		run.set( true );
+    		run.notify( );
+    	}
+    }
+
+    public boolean isTerminated( ) {
+    	return Arrays.stream( simulatorPool ).allMatch( s -> s.isTerminated( ) );
+    }
+
+    public State getState( ) {
+    	return actualState;
     }
 
     private Body[] allocateBalls( int nBodies ) {
@@ -126,7 +134,7 @@ public class Model {
         
         return bodies;
     }
-    
+
     public class State {
 
     	private int iterations;

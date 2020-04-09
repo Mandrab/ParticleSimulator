@@ -1,4 +1,4 @@
-package main;
+package main.model;
 
 /*
  *   V2d.java

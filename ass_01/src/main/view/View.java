@@ -1,4 +1,4 @@
-package main;
+package main.view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -14,14 +14,16 @@ import java.util.List;
 
 import javax.swing.*;
 
-import main.Model.State;
+import main.controller.Controller;
+import main.controller.Position;
+import main.model.Model.State;
 
 /**
  * Simulation view
  * @author aricci
  *
  */
-public class View extends JFrame implements ActionListener{
+public class View extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = -5516015410790143416L;
 	private static final int WIDTH = 620;
@@ -32,6 +34,7 @@ public class View extends JFrame implements ActionListener{
 	private VisualiserPanel panel;
 	private JButton buttonStart;
 	private JButton buttonStop;
+	private JButton buttonStep;
 	private JPanel buttonPanel;
     
     /**
@@ -66,10 +69,14 @@ public class View extends JFrame implements ActionListener{
 
         buttonStop = new JButton( "stop" );
         buttonStop.addActionListener( this );
+        
+        buttonStep = new JButton( "step" );
+        buttonStep.addActionListener( this );
 
         buttonPanel = new JPanel( );
         buttonPanel.add( this.buttonStart );
         buttonPanel.add( this.buttonStop );
+        buttonPanel.add( this.buttonStep );
         buttonPanel.setPreferredSize( new Dimension( WIDTH, buttonPanel.getPreferredSize( ).height ) );
 
         add( buttonPanel, BorderLayout.NORTH );
@@ -137,11 +144,13 @@ public class View extends JFrame implements ActionListener{
 		Object src = action.getSource();
         if ( src == buttonStart ) {
         	SwingUtilities.invokeLater( ( ) -> controller.start( ) );
-        } else {
-        	SwingUtilities.invokeLater( ( ) -> controller.pause( ) );
+        } else if ( src == buttonStop ) {
+        	SwingUtilities.invokeLater( ( ) -> controller.stop( ) );
+        } else if ( src == buttonStep ) {
+        	SwingUtilities.invokeLater( ( ) -> controller.step( ) );
         }
 	}
-	
+
 	public void updateView( State state ) {
 		display( state.getBallsPositions( ), state.getVirtualTime( ), state.getIterations( ) );
 	}

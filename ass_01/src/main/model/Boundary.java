@@ -1,4 +1,4 @@
-package main;
+package main.model;
 
 /**
  * Boundary of the field where bodies move. 

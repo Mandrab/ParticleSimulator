@@ -1,6 +1,8 @@
-package main;
+package main.model;
 
 import java.util.concurrent.locks.Lock;
+
+import main.controller.Position;
 
 /*
  * This class represents a body, moving in the field.

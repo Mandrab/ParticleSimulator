@@ -3,7 +3,7 @@ package main.builders;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import main.GlobalLogger;
+import main.controller.GlobalLogger;
 
 public class BodiesDistributorBuilder {
 
