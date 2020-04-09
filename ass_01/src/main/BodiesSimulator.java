@@ -23,7 +23,10 @@ public class BodiesSimulator {
     	boolean launchGui = argsList.stream( ).anyMatch( s -> s.equals( "-gui" ) );
     	if ( launchGui ) {
     		controller.setGraphicMode( );
-    	} else controller.run( );
+    		controller.stop( );
+    	}
+    	
+    	controller.run( );
     }
 
     private static Optional<String> getValueOf( List<String> list, String name ) {

@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import main.controller.GlobalLogger;
 
 /*
- * possibilita'� di eseguire il calcolo del solveCollision fuori sezione critica
+ * possibilita' di eseguire il calcolo del solveCollision fuori sezione critica
  * 	-> check variazione nelle prestazioni
  */
 public class Simulator {
@@ -30,8 +30,6 @@ public class Simulator {
 	private Body[] conflictArray;
 
 	private double virtualTime;
-	
-	private Runnable callback;
 
 	public Simulator( Boundary bounds ) {
 		this.bounds = bounds;
@@ -128,7 +126,6 @@ public class Simulator {
 	        }
 
 	        terminated.set( true );
-	        if ( callback != null ) callback.run( );
 		} );
 
 		thread.start( );
@@ -137,10 +134,6 @@ public class Simulator {
 	public void setWorkspace( Body[] bodies, Function<Integer, int[]> indexesSupplier ) {
 		this.bodies = bodies;
 		this.indexesSupplier = indexesSupplier;
-	}
-	
-	public void setCallback( Runnable callback ) {
-		this.callback = callback;
 	}
 
 	public double getVirtualTime( ) {

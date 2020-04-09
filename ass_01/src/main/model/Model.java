@@ -52,7 +52,7 @@ public class Model {
         run.set( true );
     }
 
-    public void execute( int nSteps, Optional<Runnable> callback ) throws InterruptedException {
+    public void execute( int nSteps ) throws InterruptedException {
 
     	logger.log( Level.INFO, "\nExecuting " + simulatorPool.length + " simulators\n" );
 
@@ -72,18 +72,9 @@ public class Model {
         } );
     	CyclicBarrier secondBarrier = new CyclicBarrier( simulatorPool.length );
 
-    	callback.ifPresent( runnable -> {
-    	    AtomicInteger counter = new AtomicInteger( );
-    	    for ( Simulator simulator : simulatorPool ) simulator.setCallback( ( ) -> {
-	    		if ( counter.incrementAndGet( ) == simulatorPool.length )
-	    			runnable.run( );
-    	    } );
-    	} );
-
         for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, firstBarrier, secondBarrier );
 
-        if ( ! callback.isPresent( ) )
-        	for ( Simulator simulator : simulatorPool ) simulator.join( );
+        for ( Simulator simulator : simulatorPool ) simulator.join( );
     }
 
     public void start( ) {

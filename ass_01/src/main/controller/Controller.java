@@ -1,6 +1,5 @@
 package main.controller;
 
-import java.util.Optional;
 import java.util.logging.Level;
 
 import main.builders.SimulatorsPoolBuilder;
@@ -21,8 +20,6 @@ public class Controller {
 	private int nSteps;
 	private int nSimulators;
 	private boolean launchGui;
-	
-	private boolean run;
 
     public Controller( ) {
 
@@ -39,8 +36,6 @@ public class Controller {
 
     public void run( ) {
 
-    	run = true;
-
     	logger.log( Level.INFO, "Simulation will evaluate \t" + nBodies + " bodies" );
     	logger.log( Level.INFO, "Simulation will run for \t" + nSteps + " steps" );
     	if ( launchGui ) logger.log( Level.INFO, "Simulation will run in \t\tGUI mode\n" );
@@ -51,17 +46,15 @@ public class Controller {
     	long startTime = System.currentTimeMillis( );
 
     	try {
-    		if ( launchGui )
-    			model.execute( nSteps, Optional.of( ( ) -> logger.log( Level.INFO,
-    				"Elapsed time " + ( System.currentTimeMillis( ) - startTime ) ) ) );
-    		else model.execute( nSteps, Optional.empty( ) );
+    		model.execute( nSteps );
     	} catch ( InterruptedException e ) { e.printStackTrace( ); }
 
-    	logger.log( Level.INFO, "Elapsed time " + ( System.currentTimeMillis( ) - startTime ) );
+    	long stopTime = System.currentTimeMillis( );
+
+    	logger.log( Level.INFO, "Elapsed time " + ( stopTime - startTime ) );
     }
 
     public void start( ) {
-    	if ( ! run ) run( );
     	model.start( );
     }
 
@@ -70,7 +63,6 @@ public class Controller {
     }
     
     public void step( ) {
-    	if ( ! run ) run( );
     	model.step( );
     }
     
