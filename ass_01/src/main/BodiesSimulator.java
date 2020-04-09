@@ -25,7 +25,7 @@ public class BodiesSimulator {
     		controller.setGraphicMode( );
     		controller.stop( );
     	}
-    	
+
     	controller.run( );
     }
 

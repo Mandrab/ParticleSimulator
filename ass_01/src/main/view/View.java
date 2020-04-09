@@ -32,10 +32,11 @@ public class View extends JFrame implements ActionListener {
 	private Controller controller;
 	
 	private VisualiserPanel panel;
+	private JPanel buttonPanel;
+	private JTextField textField;
 	private JButton buttonStart;
 	private JButton buttonStop;
 	private JButton buttonStep;
-	private JPanel buttonPanel;
     
     /**
      * Creates a view of the specified size (in pixels)
@@ -64,6 +65,9 @@ public class View extends JFrame implements ActionListener {
 			}
 		} );
 
+        textField = new JTextField( "Bodies: " + 0 + " - virtual: " + 0.0 + " - numberIter: " + 0.0 );
+		textField.setEditable( false );
+
         buttonStart = new JButton( "start" );
         buttonStart.addActionListener( this );
 
@@ -74,9 +78,10 @@ public class View extends JFrame implements ActionListener {
         buttonStep.addActionListener( this );
 
         buttonPanel = new JPanel( );
-        buttonPanel.add( this.buttonStart );
-        buttonPanel.add( this.buttonStop );
-        buttonPanel.add( this.buttonStep );
+        buttonPanel.add( textField );
+        buttonPanel.add( buttonStart );
+        buttonPanel.add( buttonStop );
+        buttonPanel.add( buttonStep );
         buttonPanel.setPreferredSize( new Dimension( WIDTH, buttonPanel.getPreferredSize( ).height ) );
 
         add( buttonPanel, BorderLayout.NORTH );
@@ -94,13 +99,12 @@ public class View extends JFrame implements ActionListener {
         } catch ( Exception ex ) { }
     }
         
-    public static class VisualiserPanel extends JPanel {
+    public class VisualiserPanel extends JPanel {
 
 		private static final long serialVersionUID = -165761220960106001L;
 
 		private List<Position> bodies = new ArrayList<Position>( );
     	private long nIter;
-    	private double vt;
     	
         private long dx;
         private long dy;
@@ -126,14 +130,13 @@ public class View extends JFrame implements ActionListener {
 		        int y0 = ( int )( dy - b.getY( ) * dy );
 		        g2.drawOval( x0, y0, ( int )( rad * dx * 2 ), ( int )( rad * dy * 2 ) );
 		    } );
-    		String time = String.format( "%.2f", vt );
-    		g2.drawString( "Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter, 2, 20 );
         }
-        
+
         public void display( List<Position> bodies, double vt, long iter ) {
-            this.bodies = bodies;
-            this.vt = vt;
+        	this.bodies = bodies;
             this.nIter = iter;
+            String time = String.format( "%.2f", vt );
+    		textField.setText( "Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter);
         	repaint( );
         }
     }
