@@ -1,9 +1,9 @@
-package main.builders;
+package main_jpf.builders;
 
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import main.GlobalLogger;
+import main_jpf.GlobalLogger;
 
 public class BodiesDistributorBuilder {
 

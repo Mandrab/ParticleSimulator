@@ -1,4 +1,4 @@
-package main;
+package main_jpf;
 
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
@@ -7,9 +7,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-import main.builders.BodiesDistributorBuilder;
-import main.builders.BodiesDistributorBuilder.Trait;
-import main.builders.SimulatorsPoolBuilder;
+import main_jpf.Body;
+import main_jpf.Boundary;
+import main_jpf.GlobalLogger;
+import main_jpf.Position;
+import main_jpf.Simulator;
+import main_jpf.Velocity;
+import main_jpf.builders.BodiesDistributorBuilder;
+import main_jpf.builders.SimulatorsPoolBuilder;
+import main_jpf.builders.BodiesDistributorBuilder.Trait;
 
 public class Model {
 

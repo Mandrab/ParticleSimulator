@@ -1,4 +1,4 @@
-package main;
+package main_jpf;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -14,11 +14,13 @@ import java.util.List;
 
 import javax.swing.*;
 
-import main.Model.State;
+import main_jpf.Controller;
+import main_jpf.Position;
+import main_jpf.Model.State;
 
 /**
  * Simulation view
- * @author aricci
+ * @author Baldini Paolo, Battstini Ylenia
  *
  */
 public class View extends JFrame implements ActionListener{

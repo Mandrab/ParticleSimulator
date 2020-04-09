@@ -3,13 +3,18 @@ package main;
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
+import main.Body;
+import main.Boundary;
+import main.GlobalLogger;
+import main.Position;
+import main.Simulator;
+import main.Velocity;
 import main.builders.BodiesDistributorBuilder;
-import main.builders.BodiesDistributorBuilder.Trait;
 import main.builders.SimulatorsPoolBuilder;
+import main.builders.BodiesDistributorBuilder.Trait;
 
 public class Model {
 
@@ -25,6 +30,8 @@ public class Model {
 	private Body[] bodies;								// bodies in the field
 	private Boundary bounds;							// boundary of the field
 
+	private int iteration;
+	
 	public Model( ) {
 		bounds = new Boundary( -1.0, -1.0, 1.0, 1.0 );	// initializing boundary
 		actualState = new State( 0, 0, new ArrayList<Position>( ) );
@@ -60,25 +67,25 @@ public class Model {
 				} catch (InterruptedException e) { e.printStackTrace( ); }
     	}
     	
-    	CyclicBarrier barrier = new CyclicBarrier( simulatorCount, ( ) -> {
-    		synchronized( run ) {
-        		while ( ! run.get( ) )
-    				try {
-    					run.wait( );
-    				} catch (InterruptedException e) { e.printStackTrace( ); }
-        	}
-    		List<Position> ballsPositions = new ArrayList<>( );
-        	for ( Body body : bodies ) {
-				ballsPositions.add( new Position( body.getPos( ).getX( ), body.getPos( ).getY( ) ) );
-			}
-        	actualState = new State( nSteps, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
-        } );
+	    	CyclicBarrier barrier = new CyclicBarrier( simulatorCount, ( ) -> {
+	    		synchronized( run ) {
+	        		while ( ! run.get( ) )
+	    				try {
+	    					run.wait( );
+	    				} catch (InterruptedException e) { e.printStackTrace( ); }
+	        	}
+	    		List<Position> ballsPositions = new ArrayList<>( );
+	        	for ( Body body : bodies ) {
+					ballsPositions.add( new Position( body.getPos( ).getX( ), body.getPos( ).getY( ) ) );
+				}
+	        	actualState = new State( nSteps, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
+	        } );
+	
+	        for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, barrier, barrier, iteration );
+	
+	        for ( Simulator simulator : simulatorPool ) simulator.join( );
 
-        for ( Simulator simulator : simulatorPool ) simulator.start( nSteps, barrier, barrier );
-
-        for ( Simulator simulator : simulatorPool ) simulator.join( );
-
-        running = false;
+	        running = false;
     }
     
     public State getState( ) {
@@ -95,6 +102,12 @@ public class Model {
         	run.notify( );
 		}
     }
+    
+    public void step( int iteration ) {
+    	for ( Simulator simulator : simulatorPool ) simulator.setStep( iteration );
+		this.iteration = iteration;
+		start();
+	}
 
     public void pause( ) {
     	synchronized ( run ) {

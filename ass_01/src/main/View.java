@@ -14,11 +14,13 @@ import java.util.List;
 
 import javax.swing.*;
 
+import main.Controller;
+import main.Position;
 import main.Model.State;
 
 /**
  * Simulation view
- * @author aricci
+ * @author Baldini Paolo, Battstini Ylenia
  *
  */
 public class View extends JFrame implements ActionListener{
@@ -32,14 +34,17 @@ public class View extends JFrame implements ActionListener{
 	private VisualiserPanel panel;
 	private JButton buttonStart;
 	private JButton buttonStop;
+	private JButton buttonStep;
 	private JPanel buttonPanel;
-    
+	private static JTextField textField;
+	
     /**
      * Creates a view of the specified size (in pixels)
      * @param WIDTH
      * @param HEIGHT
      */
-    public View( Controller controller ) {
+    @SuppressWarnings("static-access")
+	public View( Controller controller ) {
     	
     	this.controller = controller;
 
@@ -49,8 +54,8 @@ public class View extends JFrame implements ActionListener{
 
         setResizable( false );
 
-        panel = new VisualiserPanel( WIDTH, HEIGHT );
-        panel.setPreferredSize( new Dimension( WIDTH, HEIGHT ) );
+        this.panel = new VisualiserPanel( WIDTH, HEIGHT );
+        this.panel.setPreferredSize( new Dimension( WIDTH, HEIGHT ) );
 
         addWindowListener( new WindowAdapter( ) {
 			public void windowClosing( WindowEvent ev ) {
@@ -60,20 +65,30 @@ public class View extends JFrame implements ActionListener{
 				System.exit( -1 );
 			}
 		} );
+        
+        this.textField = new JTextField( "Bodies: " + 0 + " - virtual: " + 0.0 + " - numberIter: " + 0.0 );
+		this.textField.setEditable( false );
+		
+        this.buttonStart = new JButton( "start" );
+        this.buttonStart.addActionListener( this );
 
-        buttonStart = new JButton( "start" );
-        buttonStart.addActionListener( this );
+        this.buttonStop = new JButton( "stop" );
+        this.buttonStop.addActionListener( this );
+        this.buttonStop.setEnabled( false );
+        
+        this.buttonStep = new JButton( "step" );
+        this.buttonStep.addActionListener( this );
 
-        buttonStop = new JButton( "stop" );
-        buttonStop.addActionListener( this );
-
-        buttonPanel = new JPanel( );
-        buttonPanel.add( this.buttonStart );
-        buttonPanel.add( this.buttonStop );
-        buttonPanel.setPreferredSize( new Dimension( WIDTH, buttonPanel.getPreferredSize( ).height ) );
-
-        add( buttonPanel, BorderLayout.NORTH );
-        add( panel, BorderLayout.CENTER );
+        this.buttonPanel = new JPanel( );
+        this.buttonPanel.add( this.textField );
+        this.buttonPanel.add( this.buttonStart );
+        this.buttonPanel.add( this.buttonStop );
+        this.buttonPanel.add( this.buttonStep );
+      
+        this.buttonPanel.setPreferredSize( new Dimension( WIDTH, this.buttonPanel.getPreferredSize( ).height ) );
+        
+        add( this.buttonPanel, BorderLayout.NORTH );
+        add( this.panel, BorderLayout.CENTER );
 
         pack( );
         setVisible( true );
@@ -93,15 +108,14 @@ public class View extends JFrame implements ActionListener{
 
 		private List<Position> bodies = new ArrayList<Position>( );
     	private long nIter;
-    	private double vt;
     	
         private long dx;
         private long dy;
         
         public VisualiserPanel( int WIDTH, int HEIGHT ) {
             setSize( WIDTH, HEIGHT );
-            dx = WIDTH/2 - 20;
-            dy = HEIGHT/2 - 20;
+            this.dx = WIDTH/2 - 20;
+            this.dy = HEIGHT/2 - 20;
         }
 
         public void paint( Graphics g ) {
@@ -119,14 +133,13 @@ public class View extends JFrame implements ActionListener{
 		        int y0 = ( int )( dy - b.getY( ) * dy );
 		        g2.drawOval( x0, y0, ( int )( rad * dx * 2 ), ( int )( rad * dy * 2 ) );
 		    } );
-    		String time = String.format( "%.2f", vt );
-    		g2.drawString( "Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter, 2, 20 );
         }
         
         public void display( List<Position> bodies, double vt, long iter ) {
             this.bodies = bodies;
-            this.vt = vt;
             this.nIter = iter;
+            String time = String.format( "%.2f", vt );
+    		textField.setText( "Bodies: " + bodies.size( ) + " - vt: " + time + " - nIter: " + nIter);
         	repaint( );
         }
     }
@@ -135,14 +148,26 @@ public class View extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent action) {
 
 		Object src = action.getSource();
-        if ( src == buttonStart ) {
-        	SwingUtilities.invokeLater( ( ) -> controller.start( ) );
+        if ( src == this.buttonStart ) {
+        	SwingUtilities.invokeLater( ( ) -> this.controller.start( ) );
+        	this.buttonStep.setEnabled( false );
+        	this.buttonStop.setEnabled( true );
         } else {
-        	SwingUtilities.invokeLater( ( ) -> controller.pause( ) );
-        }
+        	if( src == this.buttonStep ) {
+            	SwingUtilities.invokeLater( ( ) -> this.controller.step( ) );
+            	this.buttonStop.setEnabled( false );
+            	this.buttonStart.setEnabled( false );
+            } else {
+                	SwingUtilities.invokeLater( ( ) -> this.controller.pause( ) );
+            }
+        }        
 	}
 	
 	public void updateView( State state ) {
 		display( state.getBallsPositions( ), state.getVirtualTime( ), state.getIterations( ) );
+	}
+	
+	public void terminate( ) {
+		this.buttonStep.setEnabled( false );
 	}
 }

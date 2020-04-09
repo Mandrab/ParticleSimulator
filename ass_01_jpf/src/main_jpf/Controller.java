@@ -1,4 +1,4 @@
-package main;
+package main_jpf;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -8,10 +8,15 @@ import java.util.logging.Level;
 
 import gov.nasa.jpf.vm.Verify;
 
+import main_jpf.Controller;
+import main_jpf.GlobalLogger;
+import main_jpf.Model;
+import main_jpf.View;
+
 /**
  * Bodies simulation - legacy code: sequential, unstructured
  * 
- * @author aricci
+ * @author Baldini Paolo, Battstini Ylenia
  */
 public class Controller {
 

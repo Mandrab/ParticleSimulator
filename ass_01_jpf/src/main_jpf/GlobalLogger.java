@@ -1,8 +1,10 @@
-package main;
+package main_jpf;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Level;
+
+import main_jpf.GlobalLogger;
 
 public class GlobalLogger {
 

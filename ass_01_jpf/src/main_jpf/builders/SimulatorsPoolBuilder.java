@@ -1,10 +1,10 @@
-package main.builders;
+package main_jpf.builders;
 
 import java.util.logging.Level;
 
-import main.Boundary;
-import main.GlobalLogger;
-import main.Simulator;
+import main_jpf.Boundary;
+import main_jpf.GlobalLogger;
+import main_jpf.Simulator;
 
 public class SimulatorsPoolBuilder {
 

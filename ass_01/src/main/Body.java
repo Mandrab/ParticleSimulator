@@ -2,6 +2,11 @@ package main;
 
 import java.util.concurrent.locks.Lock;
 
+import main.Body;
+import main.Boundary;
+import main.Position;
+import main.Velocity;
+
 /*
  * This class represents a body, moving in the field.
  * 

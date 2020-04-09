@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import main.Controller;
+import main.GlobalLogger;
+import main.Model;
+import main.View;
+
 /**
  * Bodies simulation - legacy code: sequential, unstructured
  * 
- * @author aricci
+ * @author Baldini Paolo, Battstini Ylenia
  */
 public class Controller {
 
@@ -23,6 +28,7 @@ public class Controller {
 
 	private int nBodies;
 	private int nSteps;
+	private int iteration;
 	private boolean launchGui;
 	
 	private boolean run;
@@ -37,6 +43,7 @@ public class Controller {
     	getValueOf( argsList, "-steps" ).ifPresent( value -> controller.setSteps( Integer.parseInt( value ) ) );
     	
     	boolean launchGui = argsList.stream( ).anyMatch( s -> s.equals( "-gui" ) );
+    	launchGui=true;
     	if ( launchGui ) {
     		controller.setGraphicMode( true );System.out.println("fsdvbsfdb " + controller.launchGui );
     		controller.run = false;
@@ -81,6 +88,8 @@ public class Controller {
 
     	model = new Model( );
     	model.initialize( nBodies );
+    	
+    	iteration = 0;
 
     	if ( launchGui ) viewUpdater.start( );
 
@@ -97,11 +106,19 @@ public class Controller {
     	terminated = true;
 
         logger.log( Level.INFO, "Elapsed time " + ( stopTime - startTime ) );
+        view.terminate();
     }
     
     public void start( ) {
     	run = true;
     	model.start( );
+    	iteration = this.nSteps;
+    }
+    
+    public void step( ) {
+    	run = true;
+    	iteration = 1;
+    	model.step( iteration );
     }
     
     public void pause( ) {

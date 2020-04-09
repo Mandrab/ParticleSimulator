@@ -1,4 +1,4 @@
-package main;
+package main_jpf;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -6,6 +6,9 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 import gov.nasa.jpf.vm.Verify;
+import main_jpf.Body;
+import main_jpf.Boundary;
+import main_jpf.GlobalLogger;
 
 /*
  * possibilita'� di eseguire il calcolo del solveCollision fuori sezione critica

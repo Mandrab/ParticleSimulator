@@ -1,6 +1,11 @@
-package main;
+package main_jpf;
 
 import java.util.concurrent.locks.Lock;
+
+import main_jpf.Body;
+import main_jpf.Boundary;
+import main_jpf.Position;
+import main_jpf.Velocity;
 
 /*
  * This class represents a body, moving in the field.

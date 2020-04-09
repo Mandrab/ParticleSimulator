@@ -1,4 +1,4 @@
-package main;
+package main_jpf;
 
 /**
  * Boundary of the field where bodies move. 
