@@ -8,10 +8,6 @@ import java.util.logging.Level;
 
 import main.GlobalLogger;
 
-/*
- * possibilita' di eseguire il calcolo del solveCollision fuori sezione critica
- * 	-> check variazione nelle prestazioni
- */
 public class Simulator {
 	
 	private static final GlobalLogger logger = GlobalLogger.get( );

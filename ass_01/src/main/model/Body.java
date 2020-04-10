@@ -2,7 +2,7 @@ package main.model;
 
 import java.util.concurrent.locks.Lock;
 
-import main.controller.Position;
+import main.Position;
 
 /*
  * This class represents a body, moving in the field.
@@ -11,11 +11,11 @@ import main.controller.Position;
 public class Body {
     
     private Position position;
-    private Velocity speed;
+    private Speed speed;
     private double radius;
     private Lock myLock;
     
-    public Body( Position position, Velocity speed, double radius, Lock lock ) {
+    public Body( Position position, Speed speed, double radius, Lock lock ) {
         this.position = position;
         this.speed = speed;
         this.radius = radius;
@@ -30,7 +30,7 @@ public class Body {
         return position;
     }
 
-    public Velocity getVel( ) {
+    public Speed getVel( ) {
         return speed;
     }
     
@@ -108,8 +108,8 @@ public class Body {
 
     	Position x1 = b1.getPos( );
     	Position x2 = b2.getPos( );
-    	Velocity v1 = b1.getVel( );
-    	Velocity v2 = b2.getVel( );
+    	Speed v1 = b1.getVel( );
+    	Speed v2 = b2.getVel( );
 
     	double xDistance = x1.getX( ) - x2.getX( );
     	double xDistanceSquare = xDistance * xDistance;

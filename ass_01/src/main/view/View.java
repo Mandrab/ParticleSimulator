@@ -15,7 +15,7 @@ import java.util.List;
 import javax.swing.*;
 
 import main.controller.Controller;
-import main.controller.Position;
+import main.Position;
 import main.model.Model.State;
 
 /**
