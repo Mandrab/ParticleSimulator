@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 import main.builders.BodiesDistributorBuilder;
 import main.builders.BodiesDistributorBuilder.Trait;
-import main.controller.GlobalLogger;
+import main.GlobalLogger;
 import main.controller.Position;
 import main.builders.SimulatorsPoolBuilder;
 

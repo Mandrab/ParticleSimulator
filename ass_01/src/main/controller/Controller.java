@@ -2,6 +2,7 @@ package main.controller;
 
 import java.util.logging.Level;
 
+import main.GlobalLogger;
 import main.builders.SimulatorsPoolBuilder;
 import main.model.Model;
 import main.view.View;

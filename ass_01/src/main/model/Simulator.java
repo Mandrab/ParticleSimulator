@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import main.controller.GlobalLogger;
+import main.GlobalLogger;
 
 /*
  * possibilita' di eseguire il calcolo del solveCollision fuori sezione critica

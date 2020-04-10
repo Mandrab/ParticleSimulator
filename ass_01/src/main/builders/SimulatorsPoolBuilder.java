@@ -2,7 +2,7 @@ package main.builders;
 
 import java.util.logging.Level;
 
-import main.controller.GlobalLogger;
+import main.GlobalLogger;
 import main.model.Boundary;
 import main.model.Simulator;
 
