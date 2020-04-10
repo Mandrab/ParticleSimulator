@@ -2,25 +2,22 @@ package main.model;
 
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-import main.builders.BodiesDistributorBuilder;
-import main.builders.BodiesDistributorBuilder.Trait;
 import main.controller.GlobalLogger;
 import main.controller.Position;
+import main.builders.BodiesDistributorBuilder;
 import main.builders.SimulatorsPoolBuilder;
+import main.builders.BodiesDistributorBuilder.Trait;
 
 public class Model {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );
 
 	private State actualState;							// model's element state ( iteration, virtual time, bodies positions )
-
-	private AtomicBoolean run;							// intention
-	private AtomicInteger steps;
+	
+	private Resource syncResource;						// resource for synchronized action
 
 	private Simulator[] simulatorPool;
 	private Body[] bodies;								// bodies in the field
@@ -29,9 +26,8 @@ public class Model {
 	public Model( ) {
 		bounds = new Boundary( -1.0, -1.0, 1.0, 1.0 );	// initializing boundary
 		actualState = new State( 0, 0, new ArrayList<Position>( ) );
-
-		run = new AtomicBoolean( );
-		steps = new AtomicInteger( );
+		
+		syncResource = new Resource( );
 	}
 
     public void initialize( int nBodies, int nSimulators ) {
@@ -48,8 +44,6 @@ public class Model {
     	for ( Body body : bodies ) ballsPositions.add( body.getPos( ).clone( ) );
 
     	actualState = new State( 0, simulatorPool[ 0 ].getVirtualTime( ), ballsPositions );
-
-        run.set( true );
     }
 
     public void execute( int nSteps ) throws InterruptedException {
@@ -57,14 +51,9 @@ public class Model {
     	logger.log( Level.INFO, "\nExecuting " + simulatorPool.length + " simulators\n" );
 
     	CyclicBarrier firstBarrier = new CyclicBarrier( simulatorPool.length, ( ) -> {
-    		synchronized( run ) {
-    			while ( ! run.get( ) )
-    				try {
-    					run.wait( );
-    				} catch (InterruptedException e) { e.printStackTrace( ); }
-    			if ( steps.get( ) > 0 )
-    				run.set( false );
-        	}
+    	
+    		syncResource.manage( );
+    		
     		List<Position> ballsPositions = new ArrayList<>( );
         	for ( Body body : bodies ) ballsPositions.add( body.getPos( ).clone( ) );
 
@@ -78,25 +67,15 @@ public class Model {
     }
 
     public void start( ) {
-    	synchronized ( run ) {
-    		steps.set( 0 );
-    		run.set( true );
-        	run.notify( );
-		}
+    	syncResource.start( );
     }
 
     public void stop( ) {
-    	synchronized ( run ) {
-    		run.set( false );
-    	}
+    	syncResource.stop( );
     }
 
     public void step( ) {
-    	synchronized ( run ) {
-    		steps.set( 1 );
-    		run.set( true );
-    		run.notify( );
-    	}
+    	syncResource.step( );
     }
 
     public boolean isTerminated( ) {
