@@ -21,6 +21,7 @@ public class Model {
 
 	public Model( ) {
 		syncResource = new Resource( this );
+    	actualState = new State( 0 );
 	}
 	
 	public void initialize( int nSimulators ) {
@@ -29,8 +30,6 @@ public class Model {
 
 		for ( int i = 0; i < nSimulators; i++ )
 			simulatorPool[ i ] = new StartStopSimulator( );
-
-    	actualState = new State( 0 );
 	}
 
     public void initialize( int nBodies, int nSimulators ) {
@@ -92,7 +91,7 @@ public class Model {
     }
 
     public class State {
-    	
+
     	public State( int iterations ) { }
     }
 }

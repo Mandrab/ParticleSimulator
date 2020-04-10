@@ -13,7 +13,7 @@ public class ViewThread extends Thread {
 
 	public void run( ) {
 
-		for ( int i = 0; i < 5; i++ ) {
+		for ( int i = 0; i < 2; i++ ) {
 			switch ( Verify.random( 1 ) ) {
 				case 0:
 					controller.start( );

@@ -57,8 +57,8 @@ public class Controller {
 			 * Thank to JPF there is no need of the while cycle. Indeed, it will
 			 * try all the possible combination of this action
 			 */
-			model.getState( );
-			model.getState( );
+			assert model.getState( ) != null : "model state should not be null";
+			assert model.getState( ) != null : "model state should not be null";
     	}
     }
 }
