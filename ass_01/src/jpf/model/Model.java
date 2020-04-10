@@ -20,7 +20,7 @@ public class Model {
 	private Body[] bodies;								// bodies in the field
 
 	public Model( ) {
-		syncResource = new Resource( );
+		syncResource = new Resource( this );
 	}
 	
 	public void initialize( int nSimulators ) {
@@ -71,6 +71,10 @@ public class Model {
 
     public void stop( ) {
     	syncResource.stop( );
+    }
+    
+    public Simulator[] getSimulators( ) {
+    	return simulatorPool;
     }
 
     public State getState( ) {

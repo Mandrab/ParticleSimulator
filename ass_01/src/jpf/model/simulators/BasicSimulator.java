@@ -17,9 +17,12 @@ public class BasicSimulator implements Simulator {
 	private Function<Integer, int[]> indexesSupplier;
 
 	private Body[] conflictArray;
+	
+	private int step;
 
 	public BasicSimulator( ) {
 		this.conflictArray = new Body[ CONFLICT_ARRAY_SIZE ];
+		this.thread = new Thread( );
 	}
 
 	public void start( int nSteps, CyclicBarrier firstBarrier, CyclicBarrier secondBarrier ) {
@@ -36,7 +39,7 @@ public class BasicSimulator implements Simulator {
 
         	Body firstBall, secondBall;
 
-	        for ( int step = 0; step < nSteps; step++ ) {			// loop for number of iteration
+	        for ( step = 0; step < nSteps; step++ ) {			// loop for number of iteration
 
 	        	/*
 	        	 * due to the control made in 'BodiesDistributorBuilder', only a  thread can call updatePos on a body.
@@ -136,6 +139,14 @@ public class BasicSimulator implements Simulator {
 	public void setWorkspace( Body[] bodies, Function<Integer, int[]> indexesSupplier ) {
 		this.bodies = bodies;
 		this.indexesSupplier = indexesSupplier;
+	}
+	
+	public Thread.State getState( ) {
+		return thread.getState( );
+	}
+	
+	public int getIteration( ) {
+		return step;
 	}
 
 	public void join( ) throws InterruptedException {

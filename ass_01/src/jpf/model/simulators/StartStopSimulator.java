@@ -6,15 +6,20 @@ import java.util.concurrent.CyclicBarrier;
 public class StartStopSimulator implements Simulator {
 
 	private Thread thread;
+	private int step;
+	
+	public StartStopSimulator( ) {
+		thread = new Thread( );
+	}
 
 	public void start( int nSteps, CyclicBarrier firstBarrier, CyclicBarrier secondBarrier ) {
 
 		thread = new Thread( ( ) -> {
 
-	        for ( int step = 0; step < nSteps; step++ ) {
+	        for ( step = 0; step < nSteps; step++ ) {
 
 	        	// UPDATE POSITIONS
-	        	
+
 	        	try {
 	        		firstBarrier.await( );
 				} catch ( InterruptedException | BrokenBarrierException e ) {
@@ -35,6 +40,14 @@ public class StartStopSimulator implements Simulator {
 		} );
 
 		thread.start( );
+	}
+	
+	public Thread.State getState( ) {
+		return thread.getState( );
+	}
+	
+	public int getIteration( ) {
+		return step;
 	}
 
 	public void join( ) throws InterruptedException {
