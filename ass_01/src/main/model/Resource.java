@@ -54,7 +54,7 @@ public class Resource {
     public synchronized void stop() {
     	setRun( false );
     	stopTime = System.currentTimeMillis();
-    	logger.log( Level.INFO, "Elapsed time " + ( stopTime - startTime ) );
+    	logger.log( Level.INFO, "Elapsed user time " + ( stopTime - startTime ) );
      }
     
     public synchronized void step() {
