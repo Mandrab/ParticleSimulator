@@ -4,7 +4,20 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-
+/**
+ * This class is the class that deals with resolving the position update, 
+ * solveCollison and checkandsolveBoundaryCollision.
+ * It contains the start method, the main method for creating the competition
+ * that it performs for the number of steps taken as input.
+ * Inside it creates a cyclic barrier and, for each body, it checks collisions; 
+ * if there are, it takes the lock on both bodies and resolves them otherwise it goes on 
+ * and awaits on barrier waiting for all the Simulators. 
+ * The last one will break the barrier by allowing others to move forward. 
+ * Then boundary collisions are checked and resolved.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia
+ *
+ */
 public class Simulator {
 
 	private static final double INCREMENT_TIME = 0.1;
@@ -48,7 +61,7 @@ public class Simulator {
 	        	// compute new bodies positions
 	        	for ( int i = 0; i < indexesCount; i++ )
 		        	bodies[ indexes[ i ] ].updatePos( INCREMENT_TIME );
-
+	        
 	        	try {
 	        		firstBarrier.await( );
 				} catch ( InterruptedException | BrokenBarrierException e ) {

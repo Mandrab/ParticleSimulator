@@ -1,10 +1,11 @@
 package main.model;
 
 /**
- *
- * 2-dimensional vector
+ * Class for Velocity. 
+ * Contains 2-dimensional vector
  * objects are completely state-less
  *
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public class Speed  {
 

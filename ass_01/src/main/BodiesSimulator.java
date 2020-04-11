@@ -6,7 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 import main.controller.Controller;
-
+/**
+ * Class that contains the main method.
+ * It has two modes, in case it has been set on the command line
+ * the "-gui" flag is launched in the GUI mode, if not, no.
+ * From the command line the bodies, steps and number of simulators can also be specified.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia 
+ *
+ */
 public class BodiesSimulator {
 
 	public static void main( String[] args ) throws InterruptedException {

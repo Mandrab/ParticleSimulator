@@ -3,6 +3,7 @@ package main.model;
 /**
  * Boundary of the field where bodies move. 
  *
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public class Boundary {
 	private double x0;

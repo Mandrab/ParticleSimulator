@@ -19,8 +19,13 @@ import main.Position;
 import main.model.Model.State;
 
 /**
- * Simulation view
- * @author aricci
+ * This class deals with the views, creates the panel for the view with the related buttons.
+ * The view contains three buttons: start, stop and step.
+ * Button start-> the view starts its execution, 
+ * Button stop-> the execution stops and the progress is shown on the screen.
+ * Button step-> step by step you execute the mode.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia
  *
  */
 public class View extends JFrame implements ActionListener {
@@ -38,11 +43,6 @@ public class View extends JFrame implements ActionListener {
 	private JButton buttonStop;
 	private JButton buttonStep;
     
-    /**
-     * Creates a view of the specified size (in pixels)
-     * @param WIDTH
-     * @param HEIGHT
-     */
     public View( Controller controller ) {
     	
     	this.controller = controller;

@@ -1,23 +1,18 @@
 package main.model;
 
-import java.util.logging.Level;
-
-import main.GlobalLogger;
-
 /**
  * Class used for synchronization
+ * Contains method start, stop and step.
+ * Contains method to get and set a condition variable.
+ * 
  * 
  * @author Baldini Paolo, Battistini Ylenia
  *
  */
 public class Resource {
 	
-	private static final GlobalLogger logger = GlobalLogger.get( );
-	
 	private boolean run ;
 	private int steps;
-	private long startTime;
-	private long stopTime;
 	
 	public synchronized void setRun( boolean obj ) {
 		run = obj;
@@ -46,18 +41,16 @@ public class Resource {
 
 	public synchronized void start() {
        setRun( true );
-       startTime = System.currentTimeMillis();
        setSteps( 0 );
        notify( );
     }
     
     public synchronized void stop() {
     	setRun( false );
-    	stopTime = System.currentTimeMillis();
-    	logger.log( Level.INFO, "Elapsed user time " + ( stopTime - startTime ) );
      }
     
     public synchronized void step() {
+    	
     	setRun( true );
         setSteps( 1 );
         notify( );

@@ -1,5 +1,10 @@
 package main;
-
+/**
+ * Class that implements all methods to be able to use body positions
+ * 
+ * @author Baldini Paolo, Battistini Ylenia 
+ *
+ */
 public class Position { 
 
     private double x, y;

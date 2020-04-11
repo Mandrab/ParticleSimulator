@@ -3,7 +3,13 @@ package main;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Level;
-
+/**
+ * Class that implements the GlobalLogger, allows you to print in the console
+ * the strings specifying the level and the text to be printed.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia 
+ *
+ */
 public class GlobalLogger {
 
 	private static GlobalLogger logger;

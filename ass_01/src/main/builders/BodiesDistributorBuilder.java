@@ -5,6 +5,14 @@ import java.util.logging.Level;
 
 import main.GlobalLogger;
 
+/**
+ * Class used to distribute bodies within simulators.
+ * There are three subdivision methods, in particular the INDEX_RANGE mode,
+ * BALANCED_CALS and NEAREST_BALANCED_CALCS.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia
+ *
+ */
 public class BodiesDistributorBuilder {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );
@@ -23,7 +31,11 @@ public class BodiesDistributorBuilder {
 
 		return null;
 	}
-	
+	/**
+	 * This class divides the sores inside the simulator according to the chosen mode 
+	 * @author Baldini Paolo, Battistini Ylenia
+	 *
+	 */
 	public static abstract class Distributor implements Function<Integer, int[]> {
 
 		protected int groupsCount;

@@ -5,7 +5,14 @@ import java.util.logging.Level;
 import main.GlobalLogger;
 import main.model.Boundary;
 import main.model.Simulator;
-
+/**
+ * This class calculates the number of physical cores of the pc it is running on. 
+ * To be more complete, check if the PC supports hyperthreading mode. 
+ * Create a simulator for each core + 1 of the machine.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia
+ *
+ */
 public class SimulatorsPoolBuilder {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );

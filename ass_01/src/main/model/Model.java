@@ -9,9 +9,18 @@ import main.builders.BodiesDistributorBuilder;
 import main.builders.BodiesDistributorBuilder.Trait;
 import main.GlobalLogger;
 import main.Position;
-import main.Resource;
+import main.model.Resource;
 import main.builders.SimulatorsPoolBuilder;
-
+/**
+ * This class implements Model.
+ * This class contains the initialize method to allocate Bodies and create simulatorPool.
+ * The execute method is the main method of the class because it create a cyclicBarrier to execute manage method of Resource's class.
+ * Contains a State class to set and get an information about virtualTime, iteration and ballsPosition.
+ * It also contains the start stop and step methods with the respective calls to the Resource's class.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia
+ *
+ */
 public class Model {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );
@@ -33,7 +42,7 @@ public class Model {
 
     public void initialize( int nBodies, int nSimulators ) {
 
-    	bodies = allocateBalls( nBodies );						// generate nBodies balls
+    	bodies = allocateBodies( nBodies );						// generate nBodies balls
 
     	simulatorPool = SimulatorsPoolBuilder.getQuantity( bounds, nSimulators ); // create simulators (thread) pool
 
@@ -52,9 +61,7 @@ public class Model {
     	logger.log( Level.INFO, "\nExecuting " + simulatorPool.length + " simulators\n" );
 
     	CyclicBarrier firstBarrier = new CyclicBarrier( simulatorPool.length, ( ) -> {
-    		try {
 				syncResource.manage( );
-			} catch ( InterruptedException e ) { e.printStackTrace(); }
     		
     		List<Position> ballsPositions = new ArrayList<>( );
         	for ( Body body : bodies ) ballsPositions.add( body.getPos( ).clone( ) );
@@ -88,7 +95,7 @@ public class Model {
     	return actualState;
     }
 
-    private Body[] allocateBalls( int nBodies ) {
+    private Body[] allocateBodies( int nBodies ) {
 
     	final Body[] bodies = new Body[ nBodies ];
 

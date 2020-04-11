@@ -6,7 +6,16 @@ import main.GlobalLogger;
 import main.builders.SimulatorsPoolBuilder;
 import main.model.Model;
 import main.view.View;
-
+/**
+ * This class implement Controller.
+ * This class contains the initialize method to initialize the Model.
+ * The run method is the main method of the class because it starts the execution of the program. 
+ * It also contains the start stop and step methods with the respective calls to the model and all 
+ * the methods for setting the view, the number of bodies and the number of steps.
+ * 
+ * @author Baldini Paolo, Battistini Ylenia
+ *
+ */
 public class Controller {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );
@@ -24,8 +33,8 @@ public class Controller {
 
     public Controller( ) {
 
-    	nBodies = 1000;			// default bodies quantity
-    	nSteps = 1000;			// default step
+    	nBodies = 5000;			// default bodies quantity
+    	nSteps = 5000;			// default step
     	nSimulators = SimulatorsPoolBuilder.getOptimizedNum( nBodies, true );
     	launchGui = false;		// launch cli by default
 	}

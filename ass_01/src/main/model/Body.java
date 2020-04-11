@@ -3,10 +3,19 @@ package main.model;
 import java.util.concurrent.locks.Lock;
 
 import main.Position;
-
-/*
+/**
  * This class represents a body, moving in the field.
+ * Contains method to:
+ * Update the position, according to current velocity.
+ * Change the velocity.
+ * Check if there is collision with the specified body.
+ * Check if there collisions with the boundary and update the
+ * position and velocity accordingly.
+ *
+ * Also contains method to lock and unlock.
  * 
+ * @author Baldini Paolo, Battistini Ylenia
+ *
  */
 public class Body {
     
@@ -34,32 +43,17 @@ public class Body {
         return speed;
     }
     
-    /**
-     * Update the position, according to current velocity
-     * 
-     * @param dt time elapsed 
-     */
     public void updatePos( double dt ) {    	
     	double newPosX = position.getX( ) + speed.getX( ) * dt;
     	double newPosY = position.getY( ) + speed.getY( ) * dt;
     	position.change( newPosX, newPosY );
     }
 
-    /**
-     * Change the velocity
-     * 
-     * @param vx
-     * @param vy
-     */
+   
     public void changeVel( double vx, double vy ){
     	speed.change( vx, vy );
     }
 
-    /**
-     * Check if there is collision with the specified body
-     * @param b
-     * @return
-     */
     public boolean collideWith(Body b) {
     	double dx = Math.abs( position.getX( ) - b.getPos( ).getX( ) );
     	
@@ -72,12 +66,6 @@ public class Body {
     	return dx*dx + dy*dy < 0.02*0.02;
     }
     
-    /**
-     * Check if there collisions with the boundaty and update the
-     * position and velocity accordingly
-     * 
-     * @param bounds
-     */
     public void checkAndSolveBoundaryCollision(Boundary bounds){
     	double x = position.getX();
     	double y = position.getY();   
