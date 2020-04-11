@@ -23,7 +23,8 @@ public class BodiesSimulator {
     	boolean launchGui = argsList.stream( ).anyMatch( s -> s.equals( "-gui" ) );
     	if ( launchGui ) {
     		controller.setGraphicMode( );
-    		controller.stop( );
+    	} else {
+    		controller.start( );
     	}
 
     	controller.run( );
