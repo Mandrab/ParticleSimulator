@@ -26,7 +26,6 @@ import main.model.Model.State;
  * Button step-> step by step you execute the mode.
  * 
  * @author Baldini Paolo, Battistini Ylenia
- *
  */
 public class View extends JFrame implements ActionListener {
 
@@ -35,14 +34,20 @@ public class View extends JFrame implements ActionListener {
 	private static final int HEIGHT = 620; 
 
 	private Controller controller;
-	
+
 	private VisualiserPanel panel;
 	private JPanel buttonPanel;
 	private JTextField textField;
 	private JButton buttonStart;
 	private JButton buttonStop;
 	private JButton buttonStep;
-    
+
+	/**
+	 * Setup GUI
+	 * 
+	 * @param controller
+	 * 		reference to controller of MVC pattern
+	 */
     public View( Controller controller ) {
     	
     	this.controller = controller;
@@ -90,7 +95,17 @@ public class View extends JFrame implements ActionListener {
         pack( );
         setVisible( true );
     }
-    
+
+    /**
+     * Draw on the GUI
+     * 
+     * @param bodies
+     * 		bodies to draw
+     * @param vt
+     * 		simulation virtual time
+     * @param iter
+     * 		simulation iteration
+     */
     public void display( List<Position> bodies, double vt, long iter ){
         try {
 	    	SwingUtilities.invokeAndWait( ( ) -> {
@@ -98,7 +113,10 @@ public class View extends JFrame implements ActionListener {
 	        } );
         } catch ( Exception ex ) { }
     }
-        
+
+    /**
+     * Panel for the visualization of the simulation
+     */
     public class VisualiserPanel extends JPanel {
 
 		private static final long serialVersionUID = -165761220960106001L;
@@ -141,10 +159,13 @@ public class View extends JFrame implements ActionListener {
         }
     }
 
+    /**
+     * Manages button actions
+     */
 	@Override
 	public void actionPerformed(ActionEvent action) {
 
-		Object src = action.getSource();
+		Object src = action.getSource( );
         if ( src == buttonStart ) {
         	SwingUtilities.invokeLater( ( ) -> controller.start( ) );
         } else if ( src == buttonStop ) {
@@ -154,7 +175,13 @@ public class View extends JFrame implements ActionListener {
         }
 	}
 
+	/**
+	 * Refresh GUI
+	 * 
+	 * @param state
+	 * 		the latest info to visualize
+	 */
 	public void updateView( State state ) {
-		display( state.getBallsPositions( ), state.getVirtualTime( ), state.getIterations( ) );
+		display( state.getBodiesPositions( ), state.getVirtualTime( ), state.getIterations( ) );
 	}
 }

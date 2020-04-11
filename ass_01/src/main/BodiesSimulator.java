@@ -13,31 +13,51 @@ import main.controller.Controller;
  * From the command line the bodies, steps and number of simulators can also be specified.
  * 
  * @author Baldini Paolo, Battistini Ylenia 
- *
  */
 public class BodiesSimulator {
 
-	public static void main( String[] args ) throws InterruptedException {
+	/**
+	 * Main method to start the system 
+	 * 
+	 * @param args
+	 * 		contains optional flags such as: -gui, -bodies, -steps, -simulators
+	 */
+	public static void main( String[] args ) {
 
     	List<String> argsList = Arrays.asList( args );
     	Controller controller = new Controller( );
 
+    	// read flags for run options (#simulator, #steps, #bodies)
     	getValueOf( argsList, "-bodies" ).ifPresent( value -> controller.setBodiesCount( Integer.parseInt( value ) ) );
     	getValueOf( argsList, "-steps" ).ifPresent( value -> controller.setSteps( Integer.parseInt( value ) ) );
     	getValueOf( argsList, "-simulators" ).ifPresent( value -> controller.setSimulators( Integer.parseInt( value ) ) );
 
+    	// initialize the controller
     	controller.initialize( );
     	
+    	// eventually start system with GUI
     	boolean launchGui = argsList.stream( ).anyMatch( s -> s.equals( "-gui" ) );
     	if ( launchGui ) {
-    		controller.setGraphicMode( );
+    		controller.setGraphicMode( );	// set to start GUI
     	} else {
-    		controller.start( );
+    		controller.start( );			// set the system to start at execute call
     	}
 
+    	// run the system
     	controller.run( );
     }
 
+	/**
+	 * Get values from list of strings (searching the key)
+	 * 
+	 * @param list
+	 * 		the list in which search
+	 * @param name
+	 * 		the key string
+	 * 
+	 * @return
+	 * 		the optional value (if found)
+	 */
     private static Optional<String> getValueOf( List<String> list, String name ) {
 
     	Iterator<String> listIterator = list.iterator( );

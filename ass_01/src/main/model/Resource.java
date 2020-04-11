@@ -3,56 +3,50 @@ package main.model;
 /**
  * Class used for synchronization
  * Contains method start, stop and step.
- * Contains method to get and set a condition variable.
- * 
  * 
  * @author Baldini Paolo, Battistini Ylenia
- *
  */
 public class Resource {
 	
 	private boolean run ;
-	private int steps;
-	
-	public synchronized void setRun( boolean obj ) {
-		run = obj;
-	}
-	
-	public synchronized boolean getRun( ) {
-		return run;
-	}
-	
-	public synchronized int getSteps( ) {
-		return steps;
-	}
-	
-	public synchronized void setSteps( int obj ) {
-		steps = obj;
+	private boolean steps;
+
+	/**
+	 * Manage the flow of the program (start, stop, step)
+	 * 
+	 * @throws InterruptedException
+	 * 		see Object.wait( )
+	 */
+	public synchronized void manage( ) throws InterruptedException {
+		while ( ! run )					// if not run, block and wait to run again
+			wait( );
+
+		if ( steps ) run = false;		// if step, the next iteration should pause
 	}
 
-	public synchronized void manage( ) {
-		while ( !getRun( ) )
-			try {
-				wait( );
-			} catch (InterruptedException e) { e.printStackTrace( ); }
-		if ( getSteps( ) > 0 )
-			setRun( false );
-		}
-
-	public synchronized void start() {
-       setRun( true );
-       setSteps( 0 );
+	/**
+	 * Make the system run
+	 */
+	public synchronized void start( ) {
+       run = true;
+       steps = false;
        notify( );
     }
-    
-    public synchronized void stop() {
-    	setRun( false );
+
+	/**
+	 * Stop the system
+	 */
+    public synchronized void stop( ) {
+    	run = false;
+    	steps = false;
      }
-    
-    public synchronized void step() {
-    	
-    	setRun( true );
-        setSteps( 1 );
+
+    /**
+     * Make a step and stop
+     */
+    public synchronized void step( ) {
+    	run = true;
+        steps = true;
         notify( );
     }
 }

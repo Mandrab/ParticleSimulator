@@ -11,12 +11,16 @@ import main.GlobalLogger;
  * BALANCED_CALS and NEAREST_BALANCED_CALCS.
  * 
  * @author Baldini Paolo, Battistini Ylenia
- *
  */
 public class BodiesDistributorBuilder {
 
 	private static final GlobalLogger logger = GlobalLogger.get( );
 
+	/**
+	 * Identify the algorithm used to subdivide the bodies (their index)
+	 * 
+	 * @author Baldini Paolo, Battistini Ylenia
+	 */
 	public enum Trait {
 		INDEX_RANGE,
 		BALANCED_CALCS,
@@ -24,17 +28,19 @@ public class BodiesDistributorBuilder {
 	}
 
 	public static Function<Integer, int[]> get( int index, int groupsCount, Trait trait ) {
-		
+
 		if ( trait == Trait.INDEX_RANGE ) return new IndexRangeDistributor( index, groupsCount );
 		if ( trait == Trait.BALANCED_CALCS ) return new BalancedCalcsDistributor( index, groupsCount );
 		if ( trait == Trait.NEAREST_BALANCED_CALCS ) return new NearestBalancedCalcsDistributor( index, groupsCount );
 
 		return null;
 	}
+
 	/**
-	 * This class divides the sores inside the simulator according to the chosen mode 
+	 * This class define the base structure to subdivide the indexes (bodies) inside the 
+	 * simulator according to the chosen mode 
+	 * 
 	 * @author Baldini Paolo, Battistini Ylenia
-	 *
 	 */
 	public static abstract class Distributor implements Function<Integer, int[]> {
 
@@ -46,6 +52,12 @@ public class BodiesDistributorBuilder {
 			this.workerIndex = workerIndex;
 		}
 
+		/**
+		 * Returns the array containing the subdivided indexes
+		 * 
+		 * @param bodiesCount
+		 * 		the number of bodies to subdivide
+		 */
 		@Override
 		public int[] apply( Integer bodiesCount ) {
 			final int forNum = bodiesCount / groupsCount;
@@ -53,6 +65,8 @@ public class BodiesDistributorBuilder {
 
 			int[ ] indexes = new int[ forNum ];
 
+			// if the indexes to subdivide belongs to the last worker,
+			// then print quantity and create a greater array
 			if ( workerIndex == groupsCount -1 ) {
 				logger.log( Level.INFO, "Bodies for simulator:\t\t" + forNum );
 
@@ -65,15 +79,38 @@ public class BodiesDistributorBuilder {
 			return getFilledArray( indexes, bodiesCount, forNum, remainingItems );
 		}
 
+		/**
+		 * Require that the extended class define a subdivision strategy
+		 * 
+		 * @param indexes
+		 * 		array of indexes to fill
+		 * @param bodiesCount
+		 * 		number of bodies
+		 * @param forNum
+		 * 		number of bodies for simulator
+		 * @param remainingItems
+		 * 		additional items
+		 * 
+		 * @return
+		 * 		the filled array
+		 */
 		public abstract int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems );
 	}
-	
+
+	/**
+	 * A class that implement the INDEX_RANGE subdivision algorithm
+	 * 
+	 * @author Baldini Paolo, Battistini Ylenia
+	 */
 	public static class IndexRangeDistributor extends Distributor {
-		
+
 		public IndexRangeDistributor( int workerIndex, int groupsCount ) {
 			super( workerIndex, groupsCount );
 		}
 
+		/**
+		 * Subdivide the index with a range based strategy
+		 */
 		@Override
 		public int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems ) {
 
@@ -90,13 +127,21 @@ public class BodiesDistributorBuilder {
 			return indexes;
 		}
 	}
-	
+
+	/**
+	 * A class that implement the BALANCED_CALCS subdivision algorithm
+	 * 
+	 * @author Baldini Paolo, Battistini Ylenia
+	 */
 	public static class BalancedCalcsDistributor extends Distributor {
-		
+
 		public BalancedCalcsDistributor( int workerIndex, int groupsCount ) {
 			super( workerIndex, groupsCount );
 		}
 
+		/**
+		 * Subdivide the index with a strategy based on balance to the maximum the number of calcs
+		 */
 		@Override
 		public int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems ) {
 
@@ -114,13 +159,21 @@ public class BodiesDistributorBuilder {
 			return indexes;
 		}
 	}
-	
+
+	/**
+	 * A class that implement the NEAREST_BALANCED_CALCS subdivision algorithm
+	 * 
+	 * @author Baldini Paolo, Battistini Ylenia
+	 */
 	public static class NearestBalancedCalcsDistributor extends Distributor {
-		
+
 		public NearestBalancedCalcsDistributor( int workerIndex, int groupsCount ) {
 			super( workerIndex, groupsCount );
 		}
 
+		/**
+		 * Subdivide the index with a strategy based on balance number of calcs
+		 */
 		@Override
 		public int[] getFilledArray( int[] indexes, int bodiesCount, int forNum, int remainingItems ) {
 

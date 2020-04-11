@@ -4,6 +4,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+
 /**
  * This class is the class that deals with resolving the position update, 
  * solveCollison and checkandsolveBoundaryCollision.
@@ -16,24 +17,23 @@ import java.util.function.Function;
  * Then boundary collisions are checked and resolved.
  * 
  * @author Baldini Paolo, Battistini Ylenia
- *
  */
 public class Simulator {
 
 	private static final double INCREMENT_TIME = 0.1;
-	private static final int CONFLICT_ARRAY_SIZE = 20;
+	private static final int CONFLICT_ARRAY_SIZE = 20;		// size of the conflict array
 
-	private Thread thread;
-	private AtomicBoolean terminated;
+	private Thread thread;									// runner thread
+	private AtomicBoolean terminated;						// represent the state of the simulation
 
-	private Boundary bounds;
+	private Boundary bounds;								// bounds of the "arena" of the simulation
 
-	private Body[] bodies;		// bodies in the field
-	private Function<Integer, int[]> indexesSupplier;
+	private Body[] bodies;									// bodies in the simulation
+	private Function<Integer, int[]> indexesSupplier;		// bodies divider
 
-	private Body[] conflictArray;
+	private Body[] conflictArray;							// array where to store conflict to resolve
 
-	private double virtualTime;
+	private double virtualTime;								// virtual time of the simulation
 
 	public Simulator( Boundary bounds ) {
 		this.bounds = bounds;
@@ -41,14 +41,25 @@ public class Simulator {
 		this.terminated = new AtomicBoolean( );
 	}
 
+	/**
+	 * Start the simulation
+	 * 
+	 * @param nSteps
+	 * 		number of steps to run
+	 * @param firstBarrier
+	 * 		first synchronization barrier
+	 * @param secondBarrier
+	 * 		second synchronization barrier
+	 */
 	public void start( int nSteps, CyclicBarrier firstBarrier, CyclicBarrier secondBarrier ) {
 
-		terminated.set( false );
-		
+		terminated.set( false );							// set not ended
+
 		thread = new Thread( ( ) -> {
 
 			final int bodiesCount = bodies.length;
 
+			// get index of bodies to manage
 			final int[] indexes = indexesSupplier.apply( bodiesCount );
 			final int indexesCount = indexes.length;
 
@@ -56,12 +67,12 @@ public class Simulator {
 
         	Body firstBall, secondBall;
 
-	        for ( int step = 0; step < nSteps; step++ ) {			// loop for number of iteration
+	        for ( int step = 0; step < nSteps; step++ ) {	// loop for number of iteration
 
-	        	// compute new bodies positions
+	        	// compute bodies new positions
 	        	for ( int i = 0; i < indexesCount; i++ )
 		        	bodies[ indexes[ i ] ].updatePos( INCREMENT_TIME );
-	        
+
 	        	try {
 	        		firstBarrier.await( );
 				} catch ( InterruptedException | BrokenBarrierException e ) {
@@ -75,6 +86,9 @@ public class Simulator {
 					for ( int j = i + 1; j < bodiesCount; j++ ) {
 				        secondBall = bodies[ j ];
 
+				        // if collide, save the colliding body into the conflict array.
+				        // if the conflict array if full, then first resolve all the 
+				        // previously stored collisions
 				        if ( firstBall.collideWith( secondBall ) ) {
 				        	try {
 				        		conflictArray[ conflictArrayIdx++ ] = secondBall;
@@ -82,7 +96,9 @@ public class Simulator {
 
 								conflictArrayIdx--;
 				        		firstBall.locked( );
+
 				        		for ( int k = 0; k < conflictArrayIdx; k++ ) {
+
 						        	secondBall = conflictArray[ k ];
 						        	secondBall.locked( );
 
@@ -98,6 +114,7 @@ public class Simulator {
 						}
 					}
 
+					// resolve all the saved collisions
 					if ( conflictArrayIdx > 0 ) {
 						firstBall.locked( );
 
@@ -121,32 +138,58 @@ public class Simulator {
 					e.printStackTrace( );
 				}
 
-			    // check boundaries
+			    // check and resolve boundaries collisions
 			    for ( int i = 0; i < indexesCount; i++ )
 	        		bodies[ indexes[ i ] ].checkAndSolveBoundaryCollision( bounds );
 
-			    virtualTime += INCREMENT_TIME;
+			    virtualTime += INCREMENT_TIME;				// increment virtual time
 	        }
 
-	        terminated.set( true );
+	        terminated.set( true );							// set the simulation as ended
 		} );
 
-		thread.start( );
+		thread.start( );									// start the simulation running it on the thread
 	}
 
+	/**
+	 * Set simulator workspace (bodies and bodies' divisor)
+	 * 
+	 * @param bodies
+	 * 		bodies in the simulation
+	 * @param indexesSupplier
+	 * 		bodies subdivider
+	 */
 	public void setWorkspace( Body[] bodies, Function<Integer, int[]> indexesSupplier ) {
 		this.bodies = bodies;
 		this.indexesSupplier = indexesSupplier;
 	}
 
+	/**
+	 * Return approximated virtual time
+	 * 
+	 * @return
+	 * 		the actual virtual time in the simulation
+	 */
 	public double getVirtualTime( ) {
 		return virtualTime;
 	}
 
+	/**
+	 * Check if the simulation has ended
+	 * 
+	 * @return
+	 * 		true if ended, false otherwise
+	 */
 	public boolean isTerminated( ) {
 		return terminated.get( );
 	}
 
+	/**
+	 * Wait the simulation to end
+	 * 
+	 * @throws InterruptedException
+	 * 		see Thread.join( )
+	 */
 	public void join( ) throws InterruptedException {
 		thread.join( );
 	}
