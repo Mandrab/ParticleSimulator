@@ -1,4 +1,9 @@
 package main.model;
+
+import java.util.logging.Level;
+
+import main.GlobalLogger;
+
 /**
  * Class used for synchronization
  * 
@@ -7,8 +12,12 @@ package main.model;
  */
 public class Resource {
 	
+	private static final GlobalLogger logger = GlobalLogger.get( );
+	
 	private boolean run ;
 	private int steps;
+	private long startTime;
+	private long stopTime;
 	
 	public synchronized void setRun( boolean obj ) {
 		run = obj;
@@ -37,12 +46,15 @@ public class Resource {
 
 	public synchronized void start() {
        setRun( true );
+       startTime = System.currentTimeMillis();
        setSteps( 0 );
        notify( );
     }
     
     public synchronized void stop() {
     	setRun( false );
+    	stopTime = System.currentTimeMillis();
+    	logger.log( Level.INFO, "Elapsed time " + ( stopTime - startTime ) );
      }
     
     public synchronized void step() {
