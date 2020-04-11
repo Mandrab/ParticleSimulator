@@ -6,10 +6,10 @@ import jpf.view.ViewThread;
 
 public class Controller {
 
-	private static final int N_BODIES = 5;
+	private static final int N_BODIES = 10;
 	private static final int N_STEPS = 2;
-	private static final int N_STEPS_VIEW = 2;
-	private static final int N_SIMULATOR = 2;
+	private static final int N_STEPS_VIEW = 5;
+	private static final int N_SIMULATOR = 3;
 
 	private Model model;
 

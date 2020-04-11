@@ -4,13 +4,8 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.logging.Level;
-
-import main.GlobalLogger;
 
 public class Simulator {
-	
-	private static final GlobalLogger logger = GlobalLogger.get( );
 
 	private static final double INCREMENT_TIME = 0.1;
 	private static final int CONFLICT_ARRAY_SIZE = 20;
@@ -71,7 +66,6 @@ public class Simulator {
 				        	try {
 				        		conflictArray[ conflictArrayIdx++ ] = secondBall;
 				        	} catch ( ArrayIndexOutOfBoundsException e ) {
-				        		logger.log( Level.WARNING, e.toString( ) );
 
 								conflictArrayIdx--;
 				        		firstBall.locked( );

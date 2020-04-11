@@ -38,7 +38,7 @@ public class Model {
     	simulatorPool = SimulatorsPoolBuilder.getQuantity( bounds, nSimulators ); // create simulators (thread) pool
 
     	for ( int idx = 0; idx < nSimulators; idx++ ) {
-    		simulatorPool[ idx ].setWorkspace( bodies, BodiesDistributorBuilder.get( idx, nSimulators, Trait.INDEX_RANGE ) );
+    		simulatorPool[ idx ].setWorkspace( bodies, BodiesDistributorBuilder.get( idx, nSimulators, Trait.BALANCED_CALCS ) );
 		}
 
     	List<Position> ballsPositions = new ArrayList<>( );
