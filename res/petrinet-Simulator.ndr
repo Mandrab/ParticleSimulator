@@ -1,72 +1,72 @@
-t 175.0 325.0 t0 c 0 w n start s
-t 175.0 140.0 t1 c 0 w n start n
-p 50.0 230.0 {} 2 w
-p 270.0 140.0 p4 0 s initialization n
-p 275.0 325.0 p3 0 n initialization s
-t 365.0 325.0 t2 0 w n
-t 355.0 140.0 t3 0 w n
-p 460.0 325.0 p5 0 n {update position} s
-p 460.0 140.0 p6 0 s {update position} n
-t 525.0 230.0 t6 c 0 w n {firts barrier} w
-p 595.0 230.0 p9 0 n
-t 660.0 230.0 t8 0 w n
-p 690.0 140.0 p10 0 s {check collision} n
-p 700.0 325.0 p11 0 n {check collision} s
-t 780.0 140.0 t9 0 w n
-p 870.0 140.0 p12 0 s {solve collision} n
-t 940.0 225.0 t11 c 0 w n {second barrier} w
-t 780.0 325.0 t10 0 w n
-p 865.0 325.0 p13 0 n {solve collision} s
-t 705.0 415.0 t18 c 0 w n {step >0 } s
-n 35.0 395.0 n3 1 {100 rappresenta il numero di step}
-p 50.0 325.0 p0 10 w
+t 130.0 325.0 t0 c 0 w n start s
+t 130.0 140.0 t1 c 0 w n start n
+t 660.0 415.0 t18 c 0 w n {step >0 } s
+t 625.0 50.0 t19 c 0 w n {step>0} n
 p 50.0 140.0 p1 10 w
-p 355.0 50.0 p2 1 n
-t 670.0 50.0 t19 c 0 w n {step>0} n
-p 365.0 415.0 p7 1 s
-p 1035.0 140.0 p15 0 s {boundary collision} n
-p 1055.0 305.0 p16 0 n {boundary collision} s
-t 1145.0 140.0 t13 0 w n
-t 1150.0 305.0 t16 0 w n
-p 1255.0 140.0 p17 0 s
-p 1265.0 305.0 p18 0 n
-t 1325.0 210.0 t17 c 0 w n {join } e
-e t11 p16 1 n
-e t11 p15 1 n
-e t18 p7 1 n
-e p7 t2 1 n
-e p2 t3 1 n
-e t19 p2 1 n
-e p0 t0 10 nw
-e t0 0.987781374 13.03840481 p3 0.5075730861 21.02379604 10 nw
-e p1 t1 10 nw
-e t1 p4 10 nw
-e {} t0 1 n
-e {} t1 1 n
-e p3 t2 1 n
-e p4 t3 1 n
-e t2 p5 1 n
-e t3 p6 1 n
-e p5 0.08352384116 65.8634952 t6 0.7400657378 32.06243908 1 n
-e p6 0.9669759499 58.24946352 t6 0.2420488743 40.04996879 1 n
-e t6 p9 1 n
-e p9 t8 1 n
-e t8 0.2458126784 38.01315562 p10 0.6214638055 31.82766093 1 n
-e t8 0.753978045 40.01249805 p11 0.3515917527 38.60051813 1 n
-e p10 t9 1 n
-e t9 p12 1 n
-e p11 t10 1 n
-e t10 p13 1 n
-e p12 0.9742427729 49.64876635 t11 0.2543004381 37.01351105 1 n
-e p13 0.04336385703 70.60453243 t11 0.7456995619 37.01351105 1 n
-e p15 t13 1 n
-e p16 t16 1 n
-e t13 p17 1 n
-e t16 p18 1 n
+p 50.0 230.0 {} 2 w
+p 50.0 325.0 p0 10 w
+p 210.0 140.0 p4 0 s initialization n
+t 285.0 325.0 t2 0 w n
+p 210.0 325.0 p3 0 n initialization s
+t 285.0 140.0 t3 0 w n
+p 285.0 50.0 p2 1 n
+p 285.0 415.0 p7 1 s
+p 360.0 325.0 p5 0 n {update position} s
+p 360.0 140.0 p6 0 s {update position} n
+t 665.0 140.0 t9 0 w n
+t 665.0 325.0 t10 0 w n
+p 740.0 140.0 p12 0 s {solve collision} n
+p 740.0 325.0 p13 0 n {solve collision} s
+p 605.0 140.0 p10 0 s {check collision} n
+p 605.0 325.0 p11 0 n {check collision} s
+t 545.0 230.0 t8 0 w n
+p 485.0 230.0 p9 0 n
+t 420.0 230.0 t6 c 0 w n {firts barrier} w
+t 805.0 230.0 t11 c 0 w n {second barrier} w
+p 860.0 140.0 p15 0 s {boundary collision} n
+p 865.0 325.0 p16 0 n {boundary collision} s
+t 940.0 140.0 t13 0 w n
+t 940.0 325.0 t16 0 w n
+p 1020.0 325.0 p18 0 n
+p 1020.0 140.0 p17 0 s
+t 1080.0 230.0 t17 c 0 w n {join } e
+n 40.0 415.0 n3 1 {10 rappresenta il numero di step}
+e p18 t17 1 n
 e p17 t17 1 n
-e p18 0.1444479654 40.60788101 t17 0.6544990411 40.00000017 1 n
-e p18 0.6567508377 132.018938 t18 0.9305086292 16.55294536 1 n
-e p17 0.3367970262 104.1009126 t19 0.002743778887 58.00862005 1 n
-h petrinetAss01
+e p13 t11 1 n
+e p12 t11 1 n
+e t8 p11 1 n
+e t8 p10 1 n
+e p5 t6 1 n
+e p6 t6 1 n
+e p17 0.3497018491 93.81364506 t19 0.0 152.0 1 n
+e p18 0.6736821343 84.53401682 t18 0.9985915859 113.0044247 1 n
+e t16 p18 1 n
+e t13 p17 1 n
+e p16 t16 1 n
+e p15 t13 1 n
+e t10 p13 1 n
+e p11 t10 1 n
+e t9 p12 1 n
+e p10 t9 1 n
+e p9 t8 1 n
+e t6 p9 1 n
+e t3 p6 1 n
+e t2 p5 1 n
+e p4 t3 1 n
+e p3 t2 1 n
+e {} t1 1 n
+e {} t0 1 n
+e t1 p4 10 nw
+e p1 t1 10 nw
+e t0 0.987781374 13.03840481 p3 0.5075730861 21.02379604 10 nw
+e p0 t0 10 nw
+e t19 p2 1 n
+e p2 t3 1 n
+e p7 t2 1 n
+e t18 p7 1 n
+e t11 p15 1 n
+e t11 p16 1 n
+h {petrinet-Simulator}
 
 
