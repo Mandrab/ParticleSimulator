@@ -3,9 +3,20 @@ package jpf;
 import gov.nasa.jpf.vm.Verify;
 import jpf.controller.Controller;
 
+/**
+ * Main class that start the system
+ * 
+ * @author baldini paolo, battistini ylenia
+ */
 public class BodiesSimulator {
 
-	public static void main( String[] args ) throws InterruptedException {
+	/**
+	 * Main method to start the system 
+	 * 
+	 * @param args
+	 * 		-gui: launch the view test
+	 */
+	public static void main( String[] args ) {
 
 		// verify first part of the assignment (i.e., no GUI)
 		if ( args.length == 0 ) {		

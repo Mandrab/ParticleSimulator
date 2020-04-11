@@ -7,24 +7,40 @@ import java.util.function.Function;
 import gov.nasa.jpf.vm.Verify;
 import jpf.model.Body;
 
+/**
+ * Basic simulator used in BASIC TEST to check synchronization properties
+ * 
+ * @author baldini paolo, battistini ylenia
+ */
 public class BasicSimulator implements Simulator {
 
 	private static final int CONFLICT_ARRAY_SIZE = 20;
 
 	private Thread thread;
 
-	private Body[] bodies;
-	private Function<Integer, int[]> indexesSupplier;
+	private Body[] bodies;								// list of bodies
+	private Function<Integer, int[]> indexesSupplier;	// supplier for my bodies list
 
-	private Body[] conflictArray;
+	private Body[] conflictArray;						// arrays for store conflicts
 	
-	private int step;
+	private int step;									// actual step (used for test purpose only)
 
 	public BasicSimulator( ) {
 		this.conflictArray = new Body[ CONFLICT_ARRAY_SIZE ];
 		this.thread = new Thread( );
 	}
 
+	/**
+	 * Start the execution
+	 * 
+	 * @param nSteps
+	 * 		number of iteration to run
+	 * @param firstBarrier
+	 * 		first synchronization barrier
+	 * @param secondBarrier
+	 * 		second synchronization barrier
+	 */
+	@Override
 	public void start( int nSteps, CyclicBarrier firstBarrier, CyclicBarrier secondBarrier ) {
 
 		thread = new Thread( ( ) -> {
@@ -82,34 +98,27 @@ public class BasicSimulator implements Simulator {
 						}
 					}
 
+					// empties conflict array
 					if ( conflictArrayIdx > 0 ) {
-
 						Verify.endAtomic( );
-						
 						firstBall.lock( );
-						
 						Verify.beginAtomic( );
 
 				        for ( int k = 0; k < conflictArrayIdx; k++ ) {
-
 				        	secondBall = conflictArray[ k ];
 				        	
 				        	Verify.endAtomic( );
-				        	
 				        	secondBall.lock( );
 
 				    		Body.solveCollision( firstBall, secondBall );
-				    		
 				    		Verify.beginAtomic( );
 
 				    		secondBall.unlock( );
 						}
 				        conflictArrayIdx = 0;
-
 				        firstBall.unlock( );
 			        }
 		        }
-
 	        	Verify.endAtomic( );
 
 			    try {
@@ -123,32 +132,60 @@ public class BasicSimulator implements Simulator {
 			    /*
 	        	 * due to the control made in 'BodiesDistributorBuilder', only a  thread can call updatePos on a body.
 	        	 * This, combined with the certainty that two thread cannot be respectively in checkAndSolveBoundary-
-	        	 * Collision and solveCollision section (barriers guaranted) and that updatePos is executed serially
+	        	 * Collision and solveCollision section (barriers guaranteed) and that updatePos is executed serially
 	        	 * by the same thread, guarantee that the checkAndSolveBoundaryCollision operation cannot have race 
 	        	 * conditions
 	        	 */
 			    // SOLVE BOUNDARY COLLISION
 	        }
-	        
 	        Verify.endAtomic( );
 		} );
 
 		thread.start( );
 	}
 
+	/**
+	 * Sets workspace of the simulator (i.e., bodies and index supplier function)
+	 * 
+	 * @param bodies
+	 * 		list of bodies
+	 * @param indexesSupplier
+	 * 		index distribution function
+	 */
 	public void setWorkspace( Body[] bodies, Function<Integer, int[]> indexesSupplier ) {
 		this.bodies = bodies;
 		this.indexesSupplier = indexesSupplier;
 	}
 	
+	/**
+	 * Get the state of the internal thread. Used for test purpose only
+	 * 
+	 * @return
+	 * 		see Thread.getState( )
+	 */
+	@Override
 	public Thread.State getState( ) {
 		return thread.getState( );
 	}
 	
+	/**
+	 * Get the actual iteration. Used for test purpose only
+	 * 
+	 * @return
+	 * 		the actual iteration's step
+	 */
+	@Override
 	public int getIteration( ) {
 		return step;
 	}
 
+	/**
+	 * Wait the simulation to end
+	 * 
+	 * @throws InterruptedException
+	 * 		see Thread.join( )
+	 */
+	@Override
 	public void join( ) throws InterruptedException {
 		thread.join( );
 	}
