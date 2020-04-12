@@ -10,7 +10,7 @@ import jpf.model.Body;
 /**
  * Basic simulator used in BASIC TEST to check synchronization properties
  * 
- * @author baldini paolo, battistini ylenia
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public class BasicSimulator implements Simulator {
 
@@ -25,6 +25,10 @@ public class BasicSimulator implements Simulator {
 	
 	private int step;									// actual step (used for test purpose only)
 
+	/**
+	 * Constructor.
+	 * Create new thread and new conflict Array.
+	 */
 	public BasicSimulator( ) {
 		this.conflictArray = new Body[ CONFLICT_ARRAY_SIZE ];
 		this.thread = new Thread( );

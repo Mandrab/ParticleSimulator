@@ -9,7 +9,7 @@ import gov.nasa.jpf.vm.Verify;
 /**
  * A builder for distribution of bodies into simulators "algorithm"
  * 
- * @author baldini paolo, battistini ylenia
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public class BodiesDistributorBuilder {
 

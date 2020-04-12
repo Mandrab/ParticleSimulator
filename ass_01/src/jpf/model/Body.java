@@ -10,7 +10,7 @@ import gov.nasa.jpf.vm.Verify;
  * Normally contains body's data (position, speed) and methods to use them,
  * Now it only check some assertions relative to critical sections
  * 
- * @author baldini paolo, battistini ylenia
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public class Body {
 
@@ -19,6 +19,10 @@ public class Body {
 
     private Lock myLock;
     
+    /**
+     * Constructor.
+     * create new ReentrantLock for body
+     */
     public Body( ) {
         myLock = new ReentrantLock( );
 

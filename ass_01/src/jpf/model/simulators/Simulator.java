@@ -5,7 +5,7 @@ import java.util.concurrent.CyclicBarrier;
 /**
  * Interface for simulators. Used to have a unique array for the two type of simulations. Tests purpose only.
  * 
- * @author baldini paolo, battistini ylenia
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public interface Simulator {
 

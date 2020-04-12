@@ -7,7 +7,7 @@ import jpf.view.ViewThread;
 /**
  * Controller of MVC pattern
  * 
- * @author baldini paolo, battistini ylenia
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public class Controller {
 
@@ -76,7 +76,7 @@ public class Controller {
     /**
      * Normally defines the refresh rate; now it only assert that the required data are not null
      * 
-     * @author baldini paolo, battistini ylenia
+     * @author Baldini Paolo, Battistini Ylenia
      */
     private class ViewUpdater extends Thread {
 

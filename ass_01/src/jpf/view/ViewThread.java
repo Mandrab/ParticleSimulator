@@ -17,10 +17,19 @@ public class ViewThread extends Thread {
 	
 	private Controller controller;
 	
+	/**
+	 * Method how set the controller
+	 * 
+	 * @param controller
+	 */
 	public ViewThread( Controller controller ) {
 		this.controller = controller;
 	}
 
+	/**
+	 * Run method. It contains a switch of JPF for 
+	 * simulate start and stop as user input.
+	 */
 	public void run( ) {
 
 		for ( int i = 0; i < 2; i++ ) {

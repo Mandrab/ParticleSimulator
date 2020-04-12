@@ -6,7 +6,7 @@ import jpf.controller.Controller;
 /**
  * Main class that start the system
  * 
- * @author baldini paolo, battistini ylenia
+ * @author Baldini Paolo, Battistini Ylenia
  */
 public class BodiesSimulator {
 
