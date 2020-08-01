@@ -17,7 +17,13 @@ Beeing the goal of the project to improove knowledge about the multi-threaded in
 ## System structure and behaviour
 Below, some *Petri nets* describing the general structure/architecture and behaviour of the system are shown. We want to underline that these are a simplified version of a Petri net drawn with the goal of show in a clear way how the system's components interact. Thus that, some of the transition include some 'conditions' that made the net impossible to be automatically run by a net-simulator. We hope however that these ones can make the system's structure and behaviour clearer.
 
-# TODO PETRI NET
+![petri net 1](res/petrinet-simulator.png)
+General behaviour of the simulators in the system.
+
+![petri net 2](res/petrinet-save_in_conflict_array.png)
+Check and resolve of conflicts.
+
+Note: Petri nets have been created using [Tina](http://projects.laas.fr/tina//) tool.
 
 ## Java Pathfinder
 To check the system ability to provide some *safety* and *fairness* properties, the [Java Pathfinder](https://github.com/javapathfinder/jpf-core/wiki) tool has been used. This one has been used to check both the basic behaviour and the start/stop/step behaviour generated through user inputs.
@@ -35,4 +41,4 @@ In the first try we used index range to divide particles updates jobs. That solu
 A solution has been found implementig two different subdivision strategies. These ones aim to divide the particles responsibility between the simulators in an more equal way.<br>
 Not entering in a formal description, the basic idea is cleary represented by the image below. Regarding the change in quantity of calcs however, the new solutions lead to a different quantity: with two simulators of index *i*, *j* and *c* the quantity of bodies for simulator, whe get *c (j - i)* differences of calcs between the two. Before these strategy to be implemented, the difference of calcs was *c^2 (j - i)*.
 
-![new subdivision logic](res/bodies_subdivisions.png)
+![new particles subdivision logic](res/bodies_subdivisions-advanced_1-reason.png)
