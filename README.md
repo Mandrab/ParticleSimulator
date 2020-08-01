@@ -19,11 +19,11 @@ Beeing the goal of the project to improove knowledge about the multi-threaded in
 ## System structure and behaviour
 Below, some *Petri nets* describing the general structure/architecture and behaviour of the system are shown. We want to underline that these are a simplified version of a Petri net drawn with the goal of show in a clear way how the system's components interact. Thus that, some of the transition include some 'conditions' that made the net impossible to be automatically run by a net-simulator. We hope however that these ones can make the system's structure and behaviour clearer.
 
-![petri net 1](res/petrinet-simulator.png)
-General behaviour of the simulators in the system.
+<img src="res/petrinet-simulator.png" width="100%"/>
+General behaviour of the simulators in the system.<br>
 
-![petri net 2](res/petrinet-save_in_conflict_array.png)
-Check and resolve of conflicts.
+<img src="res/petrinet-save_in_conflict_array.png" width="100%"/>
+Check and resolve of conflicts.<br>
 
 Note: Petri nets have been created using [Tina](http://projects.laas.fr/tina//) tool.
 
@@ -38,7 +38,7 @@ This implementation detail has been introduced to reduce 'lock-gain' operations 
 That solution allow to make only *2n + 2* lock and unlock operations (1 lock and 1 unlock for each collident plus only a lock and unlock for the first particle) instead of *4n* operations (1 lock and 1 unlock for the first particle is executed at *every* collision found).<br>
 Moreover, the collision array is structured as a lightest possible array in the hope to be left in cache by the system.
 
-## Bodies subdivision
+### Bodies subdivision
 In the first try we used index range to divide particles updates jobs. That solution however, led the first simulator to execute an incredibly greater quantity of calcs to respect of the last one (see figure below).<br>
 A solution has been found implementig two different subdivision strategies. These ones aim to divide the particles responsibility between the simulators in an more equal way.<br>
 Not entering in a formal description, the basic idea is cleary represented by the image below. Regarding the change in quantity of calcs however, the new solutions lead to a different quantity: with two simulators of index *i*, *j* and *c* the quantity of bodies for simulator, whe get *c (j - i)* differences of calcs between the two. Before these strategy to be implemented, the difference of calcs was *c^2 (j - i)*.
