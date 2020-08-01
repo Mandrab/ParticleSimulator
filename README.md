@@ -8,7 +8,9 @@ The aim of this project was a better comprehension of how a multi-threaded syste
 <br><br>
 **Disclaimer:** we know that the MVC pattern has not been stictly implemented (the thread in the model section aren't the best solution). The cause of that design choice is that we believe that not separing interaction mechanism from update logic could, in this specific case, improve the clarity of the system (we want to remind you that this is only a case study).
 
-# TODO PLAY
+<!--
+MAYBE ADD A GUI GIF
+-->
 
 ## The simulator
 The simulator simulates the collision of some particles with some speed and direction. When a collision occours, the particles 'bounce' changing direction and speed according to the previous values of the particles considered.<br>
